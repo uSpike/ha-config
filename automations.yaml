@@ -1,0 +1,115 @@
+# The scene_id and scene_data for the NZW30 are as follows:
+# 
+# Action            scene_id     scene_data
+# Double tap down      1             3
+# Triple tap down      1             4
+# Quad tap down        1             5
+# Five tap down        1             6
+# Long hold down       1             1
+# 
+# Double tap up        2             3
+# Triple tap up        2             4
+# Quad tap up          2             5
+# Five tap up          2             6
+# Long hold up         2             1
+
+# Hank
+#
+# Action 		Pictogram 		scene_id 	scene_data
+# Button one tap 	Moon and Star 		1 		0
+# Button one hold 	Moon and Star 		1 		2
+# Button one release 	Moon and Star 		1 		1
+# Button two tap 	People 			2 		0
+# Button two hold 	People 			2 		2
+# Button two release 	People 			2 		1
+# Button three tap 	Circle 			3 		0
+# Button three hold 	Circle 			3 		2
+# Button three release 	Circle 			3 		1
+# Button four tap 	Circle with Line 	4 		0
+# Button four hold 	Circle with Line 	4 		2
+# Button four release 	Circle with Line 	4 		1
+
+
+#- alias: "Living room lights on"
+#  trigger:
+#    platform: event
+#    event_type: zwave.scene_activated
+#    event_data:
+#      entity_id: zwave.inovelli_nzw30s_onoff_switchscene
+#      scene_id: 2 # double tap up
+#      scene_data: 3
+#  action:
+#    service: scene.turn_on
+#    entity_id: scene.livingroom_lights_on
+    
+- alias: "Livingroom lights on"
+  hide_entity: true
+  trigger:
+    platform: event
+    event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.inovelli_nzw30s_onoff_switchscene
+      scene_id: 2 # down
+      scene_data: 0 # tap
+  action:
+    service: scene.turn_on
+    entity_id: scene.livingroom_lights_on
+    
+- alias: "Livingroom lights off"
+  hide_entity: true
+  trigger:
+    # platform: state
+    # entity_id: switch.inovelli_nzw30s_onoff_switchscene_switch
+    # to: "off"
+    platform: event
+    event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.inovelli_nzw30s_onoff_switchscene
+      scene_id: 1 # down
+      scene_data: 0 # tap
+  action:
+    service: scene.turn_on
+    entity_id: scene.livingroom_lights_off
+    
+- alias: "Livingroom lights half"
+  hide_entity: true
+  trigger:
+    platform: event
+    event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.inovelli_nzw30s_onoff_switchscene
+      scene_id: 2 # up
+      scene_data: 3 # double-tap
+  action:
+    service: scene.turn_on
+    entity_id: scene.livingroom_lights_half
+    
+- alias: "Bedroom lights toggle"
+  hide_entity: true
+  trigger:
+    platform: event
+    event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.hank_unknown_type0201_id000b
+      scene_id: 3 # middle button
+      scene_data: 0 # tap
+  action:
+    service: light.toggle
+    entity_id: light.bedroom
+
+- alias: "Go to sleep"
+  hide_entity: true
+  trigger:
+    platform: event
+    event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.hank_unknown_type0201_id000b
+      scene_id: 1 # moon and star
+      scene_data: 0 # tap
+  action:
+    - service: scene.turn_on
+      entity_id: scene.livingroom_lights_off
+    - service: light.turn_off
+      entity_id: light.bedroom
+
+

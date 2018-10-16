@@ -1,0 +1,122 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: 43.065345
+  longitude: -89.520864
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 230
+  # metric for Metric, imperial for Imperial
+  unit_system: metric
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: UTC
+  # Customization file
+  customize: !include customize.yaml
+
+# Show links to resources in log and frontend
+#introduction:
+
+# Enables the frontend
+frontend:
+
+# Enables configuration UI
+config:
+
+# Checks for available updates
+updater:
+
+# Discover some devices automatically
+#discovery:
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+conversation:
+
+# Enables support for tracking state changes over time
+history:
+
+# View all events in a logbook
+logbook:
+
+# Enables a map showing the location of tracked devices
+map:
+
+# Track the sun
+sun:
+
+# Weather prediction
+sensor:
+#  - platform: yr
+
+zwave:
+  usb_path: /dev/ttyACM0
+  
+light:
+  - platform: lifx
+  - platform: group
+    name: Livingroom Fixture
+    entities:
+      - light.light_1
+      - light.light_2
+      - light.light_3
+  - platform: group
+    name: Bedroom
+    entities:
+      - light.bedroom_1
+      - light.bedroom_2
+
+media_player:
+  - platform: yamaha_musiccast
+    host: 192.168.1.68
+  - platform: panasonic_viera
+    host: 192.168.1.71
+
+scene:
+  - name: Livingroom Lights On
+    entities:
+      light.light_rgb:
+        state: on
+        brightness: 255
+      light.livingroom_fixture:
+        state: on
+        brightness: 255
+      switch.inovelli_nzw30s_onoff_switchscene_switch:
+        state: on
+  - name: Livingroom Lights Off
+    entities:
+      light.light_rgb:
+        state: off
+      light.livingroom_fixture:
+        state: off
+      switch.inovelli_nzw30s_onoff_switchscene_switch:
+        state: off
+  - name: Livingroom Lights Half
+    entities:
+      light.light_rgb:
+        state: on
+        brightness: 127
+      light.livingroom_fixture:
+        state: on
+        brightness: 127
+      switch.inovelli_nzw30s_onoff_switchscene_switch:
+        state: on
+  - name: Bedroom Lights Off
+    entities:
+      light.bedroom:
+        state: off
+  - name: Bedroom Lights On
+    entities:
+      light.bedroom:
+        state: on
+        brightness: 127
+  - name: Go to sleep
+    entities:
+      light.bedroom:
+        state: off
+      scene.bedroom_lights_off:
+        state: on
+
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+
