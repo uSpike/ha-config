@@ -1,14 +1,1 @@
-zwave.inovelli_nzw30s_onoff_switchscene:
-  friendly_name: Living Room Light Switch
-zwave.unknown_node_2:
-  hidden: true
-switch.unknown_node_2_switch:
-  hidden: true
-light.lifx_bedroom_1:
-   name: Bedroom 1
-   platform: lifx
-   unique_id: d0:73:d5:36:39:9d
-light.lifx_bedroom_2:
-   name: Bedroom 1
-   platform: lifx
-   unique_id: d0:73:d5:36:47:28
+

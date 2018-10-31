@@ -35,7 +35,7 @@
 #    platform: event
 #    event_type: zwave.scene_activated
 #    event_data:
-#      entity_id: zwave.inovelli_nzw30s_onoff_switchscene
+#      entity_id: zwave.switch_livingroom_light
 #      scene_id: 2 # double tap up
 #      scene_data: 3
 #  action:
@@ -48,51 +48,80 @@
     platform: event
     event_type: zwave.scene_activated
     event_data:
-      entity_id: zwave.inovelli_nzw30s_onoff_switchscene
-      scene_id: 2 # down
+      entity_id: zwave.switch_livingroom_light
+      scene_id: 2 # up
       scene_data: 0 # tap
   action:
     service: scene.turn_on
-    entity_id: scene.livingroom_lights_on
+    entity_id: scene.livingroom_lights_half
     
 - alias: "Livingroom lights off"
   hide_entity: true
   trigger:
-    # platform: state
-    # entity_id: switch.inovelli_nzw30s_onoff_switchscene_switch
-    # to: "off"
     platform: event
     event_type: zwave.scene_activated
     event_data:
-      entity_id: zwave.inovelli_nzw30s_onoff_switchscene
+      entity_id: zwave.switch_livingroom_light
       scene_id: 1 # down
       scene_data: 0 # tap
   action:
     service: scene.turn_on
     entity_id: scene.livingroom_lights_off
     
-- alias: "Livingroom lights half"
+- alias: "Livingroom lights full"
   hide_entity: true
   trigger:
     platform: event
     event_type: zwave.scene_activated
     event_data:
-      entity_id: zwave.inovelli_nzw30s_onoff_switchscene
+      entity_id: zwave.switch_livingroom_light
       scene_id: 2 # up
       scene_data: 3 # double-tap
   action:
     service: scene.turn_on
-    entity_id: scene.livingroom_lights_half
+    entity_id: scene.livingroom_lights_on
     
+- alias: "Bedroom lights on"
+  hide_entity: true
+  trigger:
+    - platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.switch_bedroom
+        scene_id: 2 # up
+        scene_data: 0 # tap
+  action:
+    service: light.turn_on
+    entity_id: light.bedroom
+
+- alias: "Bedroom lights off"
+  hide_entity: true
+  trigger:
+    - platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.switch_bedroom
+        scene_id: 1 # up
+        scene_data: 0 # tap
+  action:
+    service: light.turn_off
+    entity_id: light.bedroom
+
 - alias: "Bedroom lights toggle"
   hide_entity: true
   trigger:
-    platform: event
-    event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.hank_unknown_type0201_id000b
-      scene_id: 3 # middle button
-      scene_data: 0 # tap
+    - platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.buttom_bedroom_0
+        scene_id: 3 # middle button
+        scene_data: 0 # tap
+    - platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.buttom_bedroom_1
+        scene_id: 3 # middle button
+        scene_data: 0 # tap
   action:
     service: light.toggle
     entity_id: light.bedroom
@@ -100,16 +129,44 @@
 - alias: "Go to sleep"
   hide_entity: true
   trigger:
+     - platform: event
+       event_type: zwave.scene_activated
+       event_data:
+         entity_id: zwave.buttom_bedroom_0
+         scene_id: 1 # moon and star
+         scene_data: 0 # tap
+     - platform: event
+       event_type: zwave.scene_activated
+       event_data:
+         entity_id: zwave.buttom_bedroom_1
+         scene_id: 1 # moon and star
+         scene_data: 0 # tap
+  action:
+    service: scene.turn_on
+    entity_id: scene.go_to_sleep
+
+- alias: "Office lights on"
+  hide_entity: true
+  trigger:
     platform: event
     event_type: zwave.scene_activated
     event_data:
-      entity_id: zwave.hank_unknown_type0201_id000b
-      scene_id: 1 # moon and star
+      entity_id: zwave.switch_office
+      scene_id: 2 # up
       scene_data: 0 # tap
   action:
-    - service: scene.turn_on
-      entity_id: scene.livingroom_lights_off
-    - service: light.turn_off
-      entity_id: light.bedroom
+    service: switch.turn_on
+    entity_id: switch.plug_office_ch1
 
-
+- alias: "Office lights off"
+  hide_entity: true
+  trigger:
+    platform: event
+    event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.switch_office
+      scene_id: 1 # down
+      scene_data: 0 # tap
+  action:
+    service: switch.turn_off
+    entity_id: switch.plug_office_ch1

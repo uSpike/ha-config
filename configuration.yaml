@@ -8,10 +8,17 @@ homeassistant:
   elevation: 230
   # metric for Metric, imperial for Imperial
   unit_system: metric
-  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   time_zone: UTC
   # Customization file
-  customize: !include customize.yaml
+  customize_glob:
+    "zwave.unknown_node_2*":
+      hidden: true
+    "sensor.vision_zd2102_eu_doorwindow_sensor_*":
+      hidden: true
+    "light.livingroom_fixture_*":
+      hidden: true
+    "light.bedroom_*":
+      hidden: true
 
 # Show links to resources in log and frontend
 #introduction:
@@ -29,35 +36,37 @@ updater:
 #discovery:
 
 # Allows you to issue voice commands from the frontend in enabled browsers
-conversation:
+#conversation:
 
 # Enables support for tracking state changes over time
-history:
+#history:
 
 # View all events in a logbook
-logbook:
+#logbook:
 
 # Enables a map showing the location of tracked devices
-map:
+#map:
 
 # Track the sun
 sun:
 
 # Weather prediction
-sensor:
+#sensor:
 #  - platform: yr
 
 zwave:
+  config_path: /home/homeassistant/open-zwave/config
   usb_path: /dev/ttyACM0
+
+lifx:
   
 light:
-  - platform: lifx
   - platform: group
     name: Livingroom Fixture
     entities:
-      - light.light_1
-      - light.light_2
-      - light.light_3
+      - light.livingroom_fixture_1
+      - light.livingroom_fixture_2
+      - light.livingroom_fixture_3
   - platform: group
     name: Bedroom
     entities:
@@ -73,31 +82,31 @@ media_player:
 scene:
   - name: Livingroom Lights On
     entities:
-      light.light_rgb:
+      light.livingroom_rgb:
         state: on
         brightness: 255
       light.livingroom_fixture:
         state: on
         brightness: 255
-      switch.inovelli_nzw30s_onoff_switchscene_switch:
+      switch.livingroom_light:
         state: on
   - name: Livingroom Lights Off
     entities:
-      light.light_rgb:
+      light.livingroom_rgb:
         state: off
       light.livingroom_fixture:
         state: off
-      switch.inovelli_nzw30s_onoff_switchscene_switch:
+      switch.livingroom_light:
         state: off
   - name: Livingroom Lights Half
     entities:
-      light.light_rgb:
+      light.livingroom_rgb:
         state: on
         brightness: 127
       light.livingroom_fixture:
         state: on
         brightness: 127
-      switch.inovelli_nzw30s_onoff_switchscene_switch:
+      switch.livingroom_light:
         state: on
   - name: Bedroom Lights Off
     entities:
@@ -110,9 +119,9 @@ scene:
         brightness: 127
   - name: Go to sleep
     entities:
-      light.bedroom:
-        state: off
       scene.bedroom_lights_off:
+        state: on
+      scene.livingroom_lights_off:
         state: on
 
 

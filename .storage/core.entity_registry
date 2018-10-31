@@ -1,0 +1,314 @@
+{
+    "data": {
+        "entities": [
+            {
+                "config_entry_id": "f4fb89f9bdff404fa54d0c6a4f3f7555",
+                "device_id": "32abd5d4674b42c5a90d18ca30e26df2",
+                "disabled_by": null,
+                "entity_id": "light.bedroom_1",
+                "name": null,
+                "platform": "lifx",
+                "unique_id": "d0:73:d5:36:39:9d"
+            },
+            {
+                "config_entry_id": "f4fb89f9bdff404fa54d0c6a4f3f7555",
+                "device_id": "0f47a5336aee4e83b0297760c6cbd49d",
+                "disabled_by": null,
+                "entity_id": "light.bedroom_2",
+                "name": null,
+                "platform": "lifx",
+                "unique_id": "d0:73:d5:36:47:28"
+            },
+            {
+                "config_entry_id": "e4d895a9622b4f08a5a53eb307eddaa3",
+                "device_id": "2290d6425a034a1895d9d0aaf5415dda",
+                "disabled_by": null,
+                "entity_id": "binary_sensor.vision_zd2102_eu_doorwindow_sensor_sensor",
+                "name": null,
+                "platform": "zwave",
+                "unique_id": "5-72057594126794752"
+            },
+            {
+                "config_entry_id": "e4d895a9622b4f08a5a53eb307eddaa3",
+                "device_id": "2290d6425a034a1895d9d0aaf5415dda",
+                "disabled_by": null,
+                "entity_id": "sensor.vision_zd2102_eu_doorwindow_sensor_sourcenodeid",
+                "name": null,
+                "platform": "zwave",
+                "unique_id": "5-72057594127859745"
+            },
+            {
+                "config_entry_id": "e4d895a9622b4f08a5a53eb307eddaa3",
+                "device_id": "2290d6425a034a1895d9d0aaf5415dda",
+                "disabled_by": null,
+                "entity_id": "sensor.vision_zd2102_eu_doorwindow_sensor_access_control",
+                "name": null,
+                "platform": "zwave",
+                "unique_id": "5-72057594127859857"
+            },
+            {
+                "config_entry_id": "e4d895a9622b4f08a5a53eb307eddaa3",
+                "device_id": "2290d6425a034a1895d9d0aaf5415dda",
+                "disabled_by": null,
+                "entity_id": "sensor.vision_zd2102_eu_doorwindow_sensor_burglar",
+                "name": null,
+                "platform": "zwave",
+                "unique_id": "5-72057594127859873"
+            },
+            {
+                "config_entry_id": "e4d895a9622b4f08a5a53eb307eddaa3",
+                "device_id": "2290d6425a034a1895d9d0aaf5415dda",
+                "disabled_by": null,
+                "entity_id": "sensor.vision_zd2102_eu_doorwindow_sensor_clock",
+                "name": null,
+                "platform": "zwave",
+                "unique_id": "5-72057594127859937"
+            },
+            {
+                "config_entry_id": "e4d895a9622b4f08a5a53eb307eddaa3",
+                "device_id": "2290d6425a034a1895d9d0aaf5415dda",
+                "disabled_by": null,
+                "entity_id": "sensor.vision_zd2102_eu_doorwindow_sensor_alarm_type",
+                "name": null,
+                "platform": "zwave",
+                "unique_id": "5-72057594127859713"
+            },
+            {
+                "config_entry_id": null,
+                "device_id": null,
+                "disabled_by": null,
+                "entity_id": "zwave.hank_unknown_type0201_id000b_2",
+                "name": null,
+                "platform": "zwave",
+                "unique_id": "node-6"
+            },
+            {
+                "config_entry_id": null,
+                "device_id": null,
+                "disabled_by": null,
+                "entity_id": "zwave.inovelli_nzw30_onoff_switch",
+                "name": null,
+                "platform": "zwave",
+                "unique_id": "node-9"
+            },
+            {
+                "config_entry_id": null,
+                "device_id": null,
+                "disabled_by": null,
+                "entity_id": "switch.inovelli_nzw30_onoff_switch_switch",
+                "name": null,
+                "platform": "zwave",
+                "unique_id": "9-72057594193723392"
+            },
+            {
+                "config_entry_id": null,
+                "device_id": null,
+                "disabled_by": null,
+                "entity_id": "zwave.inovelli_nzw30_smart_switch",
+                "name": null,
+                "platform": "zwave",
+                "unique_id": "node-12"
+            },
+            {
+                "config_entry_id": "e4d895a9622b4f08a5a53eb307eddaa3",
+                "device_id": "2225d19b82d645daba9969005d33810f",
+                "disabled_by": null,
+                "entity_id": "switch.inovelli_nzw30_smart_switch_switch",
+                "name": null,
+                "platform": "zwave",
+                "unique_id": "12-72057594244055040"
+            },
+            {
+                "config_entry_id": "e4d895a9622b4f08a5a53eb307eddaa3",
+                "device_id": "b2f689734b8c4d8abadb5848c2ceac18",
+                "disabled_by": null,
+                "entity_id": "switch.basement",
+                "name": "Basement light switch",
+                "platform": "zwave",
+                "unique_id": "11-72057594227277824"
+            },
+            {
+                "config_entry_id": "e4d895a9622b4f08a5a53eb307eddaa3",
+                "device_id": "050a11c512b241409a66b9f05493c264",
+                "disabled_by": null,
+                "entity_id": "switch.office",
+                "name": "Office light switch",
+                "platform": "zwave",
+                "unique_id": "13-72057594260832256"
+            },
+            {
+                "config_entry_id": "e4d895a9622b4f08a5a53eb307eddaa3",
+                "device_id": "65f4706c2d2c4ebeb57fa78579f2de7e",
+                "disabled_by": null,
+                "entity_id": "switch.bedroom",
+                "name": "Bedroom light switch",
+                "platform": "zwave",
+                "unique_id": "8-72057594176946176"
+            },
+            {
+                "config_entry_id": "e4d895a9622b4f08a5a53eb307eddaa3",
+                "device_id": "8b67a3d37924431b92ddb856a1bc0769",
+                "disabled_by": null,
+                "entity_id": "switch.livingroom_light",
+                "name": "Livingroom light switch",
+                "platform": "zwave",
+                "unique_id": "3-72057594093060096"
+            },
+            {
+                "config_entry_id": null,
+                "device_id": null,
+                "disabled_by": null,
+                "entity_id": "zwave.office_plug",
+                "name": "Office plug",
+                "platform": "zwave",
+                "unique_id": "node-10"
+            },
+            {
+                "config_entry_id": null,
+                "device_id": null,
+                "disabled_by": null,
+                "entity_id": "zwave.door_sensor_bedroom",
+                "name": "Bedroom door sensor",
+                "platform": "zwave",
+                "unique_id": "node-5"
+            },
+            {
+                "config_entry_id": null,
+                "device_id": null,
+                "disabled_by": null,
+                "entity_id": "zwave.zstick",
+                "name": "ZStick",
+                "platform": "zwave",
+                "unique_id": "node-1"
+            },
+            {
+                "config_entry_id": null,
+                "device_id": null,
+                "disabled_by": null,
+                "entity_id": "zwave.button_bedroom_0",
+                "name": "Bedroom button 0",
+                "platform": "zwave",
+                "unique_id": "node-4"
+            },
+            {
+                "config_entry_id": null,
+                "device_id": null,
+                "disabled_by": null,
+                "entity_id": "zwave.button_bedroom_1",
+                "name": "Bedroom button 1",
+                "platform": "zwave",
+                "unique_id": "node-7"
+            },
+            {
+                "config_entry_id": null,
+                "device_id": null,
+                "disabled_by": null,
+                "entity_id": "zwave.switch_office",
+                "name": "Office switch",
+                "platform": "zwave",
+                "unique_id": "node-13"
+            },
+            {
+                "config_entry_id": null,
+                "device_id": null,
+                "disabled_by": null,
+                "entity_id": "zwave.switch_bedroom",
+                "name": "Bedroom switch",
+                "platform": "zwave",
+                "unique_id": "node-8"
+            },
+            {
+                "config_entry_id": null,
+                "device_id": null,
+                "disabled_by": null,
+                "entity_id": "zwave.switch_basement",
+                "name": "Basement switch",
+                "platform": "zwave",
+                "unique_id": "node-11"
+            },
+            {
+                "config_entry_id": "e4d895a9622b4f08a5a53eb307eddaa3",
+                "device_id": "ae29cf99b404478b841960ec490e9808",
+                "disabled_by": null,
+                "entity_id": "switch.plug_office_ch1",
+                "name": "Office plug channel 1",
+                "platform": "zwave",
+                "unique_id": "10-216172782286356480"
+            },
+            {
+                "config_entry_id": "e4d895a9622b4f08a5a53eb307eddaa3",
+                "device_id": "ae29cf99b404478b841960ec490e9808",
+                "disabled_by": null,
+                "entity_id": "switch.plug_office_ch0",
+                "name": "Office plug channel 0",
+                "platform": "zwave",
+                "unique_id": "10-144115188248428544"
+            },
+            {
+                "config_entry_id": "e4d895a9622b4f08a5a53eb307eddaa3",
+                "device_id": "ae29cf99b404478b841960ec490e9808",
+                "disabled_by": null,
+                "entity_id": "switch.plug_office",
+                "name": "Office plug",
+                "platform": "zwave",
+                "unique_id": "10-72057594210500608"
+            },
+            {
+                "config_entry_id": null,
+                "device_id": null,
+                "disabled_by": null,
+                "entity_id": "zwave.switch_livingroom_light",
+                "name": "Living room light switch",
+                "platform": "zwave",
+                "unique_id": "node-3"
+            },
+            {
+                "config_entry_id": "f4fb89f9bdff404fa54d0c6a4f3f7555",
+                "device_id": "3bad9dbf33a542de84fa7eedf93ac1b0",
+                "disabled_by": null,
+                "entity_id": "light.livingroom_fixture_1",
+                "name": null,
+                "platform": "lifx",
+                "unique_id": "d0:73:d5:36:02:f7"
+            },
+            {
+                "config_entry_id": "f4fb89f9bdff404fa54d0c6a4f3f7555",
+                "device_id": "d2012e682bcc4923bec2c6644491f638",
+                "disabled_by": null,
+                "entity_id": "light.livingroom_fixture_2",
+                "name": null,
+                "platform": "lifx",
+                "unique_id": "d0:73:d5:36:10:16"
+            },
+            {
+                "config_entry_id": "f4fb89f9bdff404fa54d0c6a4f3f7555",
+                "device_id": "f76e2fda720b48d29fc658a21f4c497f",
+                "disabled_by": null,
+                "entity_id": "light.livingroom_fixture_3",
+                "name": null,
+                "platform": "lifx",
+                "unique_id": "d0:73:d5:35:04:77"
+            },
+            {
+                "config_entry_id": "f4fb89f9bdff404fa54d0c6a4f3f7555",
+                "device_id": "a3dfcb1b1dcd4bcc94481f6b4902d561",
+                "disabled_by": null,
+                "entity_id": "light.livingroom_rgb",
+                "name": "Livingroom RGB",
+                "platform": "lifx",
+                "unique_id": "d0:73:d5:39:ad:12"
+            },
+            {
+                "config_entry_id": "e4d895a9622b4f08a5a53eb307eddaa3",
+                "device_id": "2290d6425a034a1895d9d0aaf5415dda",
+                "disabled_by": null,
+                "entity_id": "sensor.bedroom_door_alarm",
+                "name": null,
+                "platform": "zwave",
+                "unique_id": "5-72057594127859729"
+            }
+        ]
+    },
+    "key": "core.entity_registry",
+    "version": 1
+}
