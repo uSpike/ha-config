@@ -1,3 +1,4 @@
+
 # The scene_id and scene_data for the NZW30 are as follows:
 # 
 # Action            scene_id     scene_data
@@ -15,19 +16,19 @@
 
 # Hank
 #
-# Action 		Pictogram 		scene_id 	scene_data
-# Button one tap 	Moon and Star 		1 		0
-# Button one hold 	Moon and Star 		1 		2
-# Button one release 	Moon and Star 		1 		1
-# Button two tap 	People 			2 		0
-# Button two hold 	People 			2 		2
-# Button two release 	People 			2 		1
-# Button three tap 	Circle 			3 		0
-# Button three hold 	Circle 			3 		2
-# Button three release 	Circle 			3 		1
-# Button four tap 	Circle with Line 	4 		0
-# Button four hold 	Circle with Line 	4 		2
-# Button four release 	Circle with Line 	4 		1
+# Action         Pictogram         scene_id     scene_data
+# Button one tap     Moon and Star         1         0
+# Button one hold     Moon and Star         1         2
+# Button one release     Moon and Star         1         1
+# Button two tap     People             2         0
+# Button two hold     People             2         2
+# Button two release     People             2         1
+# Button three tap     Circle             3         0
+# Button three hold     Circle             3         2
+# Button three release     Circle             3         1
+# Button four tap     Circle with Line     4         0
+# Button four hold     Circle with Line     4         2
+# Button four release     Circle with Line     4         1
 
 
 #- alias: "Living room lights on"
@@ -52,8 +53,8 @@
       scene_id: 2 # up
       scene_data: 0 # tap
   action:
-    service: scene.turn_on
-    entity_id: scene.livingroom_lights_half
+    service: script.turn_on
+    entity_id: script.livingroom_normal
     
 - alias: "Livingroom lights off"
   hide_entity: true
@@ -65,8 +66,8 @@
       scene_id: 1 # down
       scene_data: 0 # tap
   action:
-    service: scene.turn_on
-    entity_id: scene.livingroom_lights_off
+    service: light.turn_off
+    entity_id: light.livingroom
     
 - alias: "Livingroom lights full"
   hide_entity: true
@@ -78,73 +79,22 @@
       scene_id: 2 # up
       scene_data: 3 # double-tap
   action:
-    service: scene.turn_on
-    entity_id: scene.livingroom_lights_on
+    service: script.turn_on
+    entity_id: script.livingroom_bright
+
+- alias: "Livingroom lights dim"
+  hide_entity: true
+  trigger:
+    platform: event
+    event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.switch_livingroom_light
+      scene_id: 1 # down
+      scene_data: 3 # double-tap
+  action:
+    service: script.turn_on
+    entity_id: script.livingroom_dim
     
-- alias: "Bedroom lights on"
-  hide_entity: true
-  trigger:
-    - platform: event
-      event_type: zwave.scene_activated
-      event_data:
-        entity_id: zwave.switch_bedroom
-        scene_id: 2 # up
-        scene_data: 0 # tap
-  action:
-    service: light.turn_on
-    entity_id: light.bedroom
-
-- alias: "Bedroom lights off"
-  hide_entity: true
-  trigger:
-    - platform: event
-      event_type: zwave.scene_activated
-      event_data:
-        entity_id: zwave.switch_bedroom
-        scene_id: 1 # up
-        scene_data: 0 # tap
-  action:
-    service: light.turn_off
-    entity_id: light.bedroom
-
-- alias: "Bedroom lights toggle"
-  hide_entity: true
-  trigger:
-    - platform: event
-      event_type: zwave.scene_activated
-      event_data:
-        entity_id: zwave.buttom_bedroom_0
-        scene_id: 3 # middle button
-        scene_data: 0 # tap
-    - platform: event
-      event_type: zwave.scene_activated
-      event_data:
-        entity_id: zwave.buttom_bedroom_1
-        scene_id: 3 # middle button
-        scene_data: 0 # tap
-  action:
-    service: light.toggle
-    entity_id: light.bedroom
-
-- alias: "Go to sleep"
-  hide_entity: true
-  trigger:
-     - platform: event
-       event_type: zwave.scene_activated
-       event_data:
-         entity_id: zwave.buttom_bedroom_0
-         scene_id: 1 # moon and star
-         scene_data: 0 # tap
-     - platform: event
-       event_type: zwave.scene_activated
-       event_data:
-         entity_id: zwave.buttom_bedroom_1
-         scene_id: 1 # moon and star
-         scene_data: 0 # tap
-  action:
-    service: scene.turn_on
-    entity_id: scene.go_to_sleep
-
 - alias: "Office lights on"
   hide_entity: true
   trigger:
@@ -155,8 +105,8 @@
       scene_id: 2 # up
       scene_data: 0 # tap
   action:
-    service: switch.turn_on
-    entity_id: switch.plug_office_ch1
+    service: light.turn_on
+    entity_id: light.office
 
 - alias: "Office lights off"
   hide_entity: true
@@ -168,5 +118,97 @@
       scene_id: 1 # down
       scene_data: 0 # tap
   action:
-    service: switch.turn_off
-    entity_id: switch.plug_office_ch1
+    service: light.turn_off
+    entity_id: light.office
+
+- alias: "Basement lights off"
+  hide_entity: true
+  trigger:
+    platform: event
+    event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.switch_basement
+      scene_id: 1 # down
+      scene_data: 0 # tap
+  action:
+    service: light.turn_off
+    entity_id: light.basement
+
+- alias: "Basement lights on"
+  hide_entity: true
+  trigger:
+    platform: event
+    event_type: zwave.scene_activated
+    event_data:
+      entity_id: zwave.switch_basement
+      scene_id: 2 # up
+      scene_data: 0 # tap
+  action:
+    service: light.turn_on
+    entity_id: light.basement
+
+- alias: "Movie start"
+  hide_entity: true
+  trigger:
+    - platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.switch_basement
+        scene_id: 1 # down
+        scene_data: 3 # double-tap
+    - platform: state
+      entity_id: media_player.room1_main
+      from: 'off'
+      to: 'on'
+  action:
+    - service: scene.turn_on
+      entity_id: scene.movie
+
+- alias: "Movie end"
+  hide_entity: true
+  trigger:
+    - platform: state
+      entity_id: media_player.room1_main
+      from: 'on'
+      to: 'off'
+  action:
+    - service: light.turn_on
+      entity_id: light.basement
+
+- alias: "Vacation - turn on lights at sunset"
+  trigger:
+    - platform: sun
+      event: sunset
+  condition:
+    - condition: state
+      entity_id: input_boolean.vacation
+      state: "on"
+  action:
+    - service: script.turn_on
+      entity_id: script.livingroom_normal
+
+- alias: "Vacation - bedroom lights on"
+  trigger:
+    - platform: time
+      at: '21:00:00'
+  condition:
+    - condition: state
+      entity_id: input_boolean.vacation
+      state: "on"
+  action:
+    - service: script.turn_on
+      entity_id: script.bedroom_normal
+
+- alias: "Vacation - go to bed"
+  trigger:
+    - platform: time
+      at: '00:00:00'
+  condition:
+    - condition: state
+      entity_id: input_boolean.vacation
+      state: "on"
+  action:
+    - service: scene.turn_on
+      entity_id: scene.bedroom_dim
+    - service: light.turn_off
+      entity_id: light.livingroom

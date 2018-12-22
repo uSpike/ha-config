@@ -2,13 +2,13 @@ homeassistant:
   # Name of the location where Home Assistant is running
   name: Home
   # Location required to calculate the time the sun rises and sets
-  latitude: 43.065345
-  longitude: -89.520864
+  latitude: !secret latitude
+  longitude: !secret longitude
   # Impacts weather/sunrise data (altitude above sea level in meters)
-  elevation: 230
+  elevation: !secret elevation
   # metric for Metric, imperial for Imperial
   unit_system: metric
-  time_zone: UTC
+  time_zone: !secret time_zone
   # Customization file
   customize_glob:
     "zwave.unknown_node_2*":
@@ -20,39 +20,17 @@ homeassistant:
     "light.bedroom_*":
       hidden: true
 
-# Show links to resources in log and frontend
-#introduction:
-
-# Enables the frontend
 frontend:
-
-# Enables configuration UI
 config:
-
-# Checks for available updates
-updater:
-
-# Discover some devices automatically
-#discovery:
-
-# Allows you to issue voice commands from the frontend in enabled browsers
-#conversation:
-
-# Enables support for tracking state changes over time
-#history:
-
-# View all events in a logbook
-#logbook:
-
-# Enables a map showing the location of tracked devices
-#map:
-
-# Track the sun
+logger:
+  default: debug
 sun:
-
-# Weather prediction
-#sensor:
+sensor:
 #  - platform: yr
+  - platform: time_date
+    display_options:
+      - 'date_time'
+      - 'time_utc'
 
 zwave:
   config_path: /home/homeassistant/open-zwave/config
@@ -61,6 +39,9 @@ zwave:
 lifx:
   
 light:
+  - platform: switch
+    name: Livingroom Switch
+    entity_id: switch.livingroom_light
   - platform: group
     name: Livingroom Fixture
     entities:
@@ -68,64 +49,127 @@ light:
       - light.livingroom_fixture_2
       - light.livingroom_fixture_3
   - platform: group
+    name: Livingroom
+    entities:
+      - light.livingroom_switch
+      - light.livingroom_fixture
+      - light.livingroom_rgb
+  - platform: group
     name: Bedroom
     entities:
       - light.bedroom_1
       - light.bedroom_2
+  - platform: switch
+    name: Basement Switch
+    entity_id: switch.basement
+  - platform: switch
+    name: Basement Lamp
+    entity_id: switch.plug_basement_0
+  - platform: switch
+    name: Basement Switch
+    entity_id: switch.basement
+  - platform: group
+    name: Basement
+    entities:
+      - light.basement_switch
+      - light.basement_lamp
+  - platform: switch
+    name: Office Lamp
+    entity_id: switch.plug_office_ch1
+  - platform: group
+    name: office
+    entities:
+      - light.office_lamp
+
+switch:
+  - platform: flux
+    name: Bedroom Flux
+    lights:
+      - light.bedroom
+    start_time: '7:00'
+    stop_time: '22:00'
+    start_colortemp: 2700
+    stop_colortemp: 2200
+    sunset_colortemp: 2500
+    mode: mired
+    transition: 1
+    interval: 120
+    brightness: 150
+  - platform: flux
+    name: Livingroom Flux
+    lights:
+      - light.livingroom
+    start_time: '7:00'
+    stop_time: '22:00'
+    start_colortemp: 2700
+    stop_colortemp: 2000
+    sunset_colortemp: 2200
+    mode: mired
+    transition: 1
+    interval: 120
+    brightness: 150
+
+
 
 media_player:
   - platform: yamaha_musiccast
-    host: 192.168.1.68
+    host: 192.168.1.23
   - platform: panasonic_viera
-    host: 192.168.1.71
+    host: 192.168.1.21
+    mac: c0:d9:62:ae:17:1a 
+  - platform: snapcast
+    host: 192.168.1.99
+  - platform: mpd
+    host: 192.168.1.99
 
 scene:
-  - name: Livingroom Lights On
+  - name: Movie
     entities:
-      light.livingroom_rgb:
-        state: on
-        brightness: 255
-      light.livingroom_fixture:
-        state: on
-        brightness: 255
-      switch.livingroom_light:
-        state: on
-  - name: Livingroom Lights Off
-    entities:
-      light.livingroom_rgb:
+      light.basement_switch:
         state: off
-      light.livingroom_fixture:
-        state: off
-      switch.livingroom_light:
-        state: off
-  - name: Livingroom Lights Half
-    entities:
-      light.livingroom_rgb:
+      light.basement_lamp:
         state: on
-        brightness: 127
-      light.livingroom_fixture:
-        state: on
-        brightness: 127
-      switch.livingroom_light:
-        state: on
-  - name: Bedroom Lights Off
-    entities:
-      light.bedroom:
-        state: off
-  - name: Bedroom Lights On
-    entities:
-      light.bedroom:
-        state: on
-        brightness: 127
-  - name: Go to sleep
-    entities:
-      scene.bedroom_lights_off:
-        state: on
-      scene.livingroom_lights_off:
-        state: on
+
+script:
+  livingroom_bright:
+    alias: Livingroom Bright
+    sequence:
+      - service: switch.turn_off
+        entity_id: switch.livingroom_flux
+      - service: light.turn_on
+        entity_id: light.livingroom
+        data:
+          transition: 1
+          brightness_pct: 90
+          kelvin: 2700
+  livingroom_normal: 
+    alias: Livingroom Normal
+    sequence:
+      - service: light.turn_on
+        entity_id: light.livingroom
+      - service: switch.turn_on
+        entity_id: switch.livingroom_flux
+      - service: switch.livingroom_flux_update
+        entity_id: switch.livingroom_flux
+  livingroom_dim:
+    alias: Livingroom Dim
+    sequence:
+      - service: switch.turn_off
+        entity_id: switch.livingroom_flux
+      - service: light.turn_on
+        entity_id: light.livingroom
+        data:
+          transition: 1
+          brightness_pct: 15
+          kelvin: 2000
+
+input_boolean:
+  vacation:
+    name: Vacation Mode
+    initial: off
+    icon: mdi:hotel
 
 
 group: !include groups.yaml
 automation: !include automations.yaml
-script: !include scripts.yaml
 

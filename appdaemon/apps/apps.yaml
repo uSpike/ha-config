@@ -1,0 +1,21 @@
+Flux:
+  module: flux
+  class: Lights
+  bright:
+    brightness: 90
+    kelvin: 2700
+  dim:
+    brightness: 15
+    kelvin: 1900
+  light_entity: bedroom
+  flux_entity: bedroom_flux
+  all_entity:
+   - light.bedroom
+   - light.livingroom
+   - light.office
+   - light.basement
+  zwave_switch:
+   - zwave.switch_bedroom
+  zwave_button:
+   - zwave.button_bedroom_0
+   - zwave.button_bedroom_1

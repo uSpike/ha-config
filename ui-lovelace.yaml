@@ -1,0 +1,16 @@
+title: My Awesome Home
+views:
+    # View tab title.
+  - id: 0  # Automatically created id
+    title: Example
+    panel: true
+    # Makes the first card fill the view
+    cards:
+        # The markdown card will render markdown text.
+      - id: 1322d9e76b9c456db3a035f54c8cd1f2  # Automatically created id
+        type: markdown
+        title: Lovelace
+        content: >
+          Welcome to your **Lovelace UI**.
+
+
