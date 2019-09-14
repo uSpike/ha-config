@@ -2,42 +2,106 @@ homeassistant:
   # Name of the location where Home Assistant is running
   name: Home
   # Location required to calculate the time the sun rises and sets
-  latitude: !secret latitude
-  longitude: !secret longitude
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude
   # Impacts weather/sunrise data (altitude above sea level in meters)
-  elevation: !secret elevation
+  elevation: !secret home_elevation
   # metric for Metric, imperial for Imperial
-  unit_system: metric
+  unit_system: imperial
   time_zone: !secret time_zone
   # Customization file
-  customize_glob:
-    "zwave.unknown_node_2*":
-      hidden: true
-    "sensor.vision_zd2102_eu_doorwindow_sensor_*":
-      hidden: true
-    "light.livingroom_fixture_*":
-      hidden: true
-    "light.bedroom_*":
-      hidden: true
+  auth_mfa_modules:
+    - type: totp
+
+zone:
+  - name: Home
+    latitude: !secret home_latitude
+    longitude: !secret home_longitude
+    icon: mdi:home
+
+  - name: XES
+    latitude: !secret xes_latitude
+    longitude: !secret xes_longitude
+    radius: 250
+    icon: mdi:briefcase
+
+
+recorder:
+  purge_keep_days: 30
+  include:
+    domains:
+      - sensor
+      - switch
+      - light
+      - media_player
+      - device_tracker
+      - person
+      - zwave
+
+history:
+history_graph:
+  lights:
+    hours_to_show: 120
+    entities:
+      - light.livingroom
+      - light.kitchen
+      - light.basement
+      - light.bedroom
+      - light.front_door
+
+
+sensor:
+  - platform: template
+    sensors:
+      front_door_battery:
+        entity_id: zwave.front_door_lock
+        value_template: "{{ states.zwave.front_door_lock.attributes.battery_level }}"
+        friendly_name: 'Front Door Lock Battery'
+        unit_of_measurement: '%'
+      garage_door_battery:
+        entity_id: zwave.garage_door_lock
+        value_template: "{{ states.zwave.garage_door_lock.attributes.battery_level }}"
+        friendly_name: 'Garage Door Lock Battery'
+        unit_of_measurement: '%'
+
+binary_sensor:
+  - platform: template
+    sensors:
+      bedroom_door_open:
+        device_class: opening
+        value_template: "{{ is_state('sensor.bedroom_door_alarm_level', '255') }}"
+        friendly_name: 'Bedroom Door'
+
+http:
+  server_host: 127.0.0.1
+  base_url: http://ha.home
+  use_x_forwarded_for: true
+  trusted_proxies: 127.0.0.1
 
 frontend:
+lovelace:
+
+mobile_app:
+device_tracker:
+person:
+map:
+
+
 config:
 logger:
-  default: debug
+  default: info
 sun:
-sensor:
-#  - platform: yr
-  - platform: time_date
-    display_options:
-      - 'date_time'
-      - 'time_utc'
 
 zwave:
-  config_path: /home/homeassistant/open-zwave/config
+  config_path: /srv/homeassistant/config/open-zwave/config
   usb_path: /dev/ttyACM0
+  autoheal: false
+  polling_interval: 30000
 
 lifx:
-  
+  light:
+    server: 10.52.100.11
+
 light:
   - platform: switch
     name: Livingroom Switch
@@ -53,7 +117,7 @@ light:
     entities:
       - light.livingroom_switch
       - light.livingroom_fixture
-      - light.livingroom_rgb
+      - light.livingroom_entry_table
   - platform: group
     name: Bedroom
     entities:
@@ -65,21 +129,22 @@ light:
   - platform: switch
     name: Basement Lamp
     entity_id: switch.plug_basement_0
-  - platform: switch
-    name: Basement Switch
-    entity_id: switch.basement
   - platform: group
     name: Basement
     entities:
-      - light.basement_switch
+      - light.basement_overhead
       - light.basement_lamp
   - platform: switch
-    name: Office Lamp
+    name: Office Right Fixture
+    entity_id: switch.plug_office_ch0
+  - platform: switch
+    name: Office Left Fixture
     entity_id: switch.plug_office_ch1
   - platform: group
-    name: office
+    name: Office
     entities:
-      - light.office_lamp
+      - light.office_right_fixture
+      - light.office_left_fixture
 
 switch:
   - platform: flux
@@ -113,22 +178,17 @@ switch:
 
 media_player:
   - platform: yamaha_musiccast
-    host: 192.168.1.23
+    host: 10.52.110.12
   - platform: panasonic_viera
-    host: 192.168.1.21
+    host: 10.52.110.10
     mac: c0:d9:62:ae:17:1a 
   - platform: snapcast
-    host: 192.168.1.99
-  - platform: mpd
-    host: 192.168.1.99
+    host: 192.168.1.40
+    #  - platform: mpd
+    #    host: 192.168.1.99
 
-scene:
-  - name: Movie
-    entities:
-      light.basement_switch:
-        state: off
-      light.basement_lamp:
-        state: on
+roku:
+  - host: 10.52.110.13
 
 script:
   livingroom_bright:
@@ -142,7 +202,7 @@ script:
           transition: 1
           brightness_pct: 90
           kelvin: 2700
-  livingroom_normal: 
+  livingroom_normal:
     alias: Livingroom Normal
     sequence:
       - service: light.turn_on
@@ -162,6 +222,21 @@ script:
           transition: 1
           brightness_pct: 15
           kelvin: 2000
+  media_play:
+    alias: Media Play
+    sequence:
+      - service: light.turn_off
+        data:
+          entity_id: light.basement
+          transition: 2
+  media_pause:
+    alias: Media Pause
+    sequence:
+      - service: light.turn_on
+        data:
+          entity_id: light.basement
+          transition: 2
+          brightness: 255
 
 input_boolean:
   vacation:
@@ -170,6 +245,4 @@ input_boolean:
     icon: mdi:hotel
 
 
-group: !include groups.yaml
 automation: !include automations.yaml
-

@@ -44,7 +44,7 @@
 #    entity_id: scene.livingroom_lights_on
     
 - alias: "Livingroom lights on"
-  hide_entity: true
+  initial_state: true
   trigger:
     platform: event
     event_type: zwave.scene_activated
@@ -57,7 +57,7 @@
     entity_id: script.livingroom_normal
     
 - alias: "Livingroom lights off"
-  hide_entity: true
+  initial_state: true
   trigger:
     platform: event
     event_type: zwave.scene_activated
@@ -70,7 +70,7 @@
     entity_id: light.livingroom
     
 - alias: "Livingroom lights full"
-  hide_entity: true
+  initial_state: true
   trigger:
     platform: event
     event_type: zwave.scene_activated
@@ -83,7 +83,7 @@
     entity_id: script.livingroom_bright
 
 - alias: "Livingroom lights dim"
-  hide_entity: true
+  initial_state: true
   trigger:
     platform: event
     event_type: zwave.scene_activated
@@ -96,7 +96,7 @@
     entity_id: script.livingroom_dim
     
 - alias: "Office lights on"
-  hide_entity: true
+  initial_state: true
   trigger:
     platform: event
     event_type: zwave.scene_activated
@@ -109,7 +109,7 @@
     entity_id: light.office
 
 - alias: "Office lights off"
-  hide_entity: true
+  initial_state: true
   trigger:
     platform: event
     event_type: zwave.scene_activated
@@ -122,7 +122,7 @@
     entity_id: light.office
 
 - alias: "Basement lights off"
-  hide_entity: true
+  initial_state: true
   trigger:
     platform: event
     event_type: zwave.scene_activated
@@ -135,7 +135,7 @@
     entity_id: light.basement
 
 - alias: "Basement lights on"
-  hide_entity: true
+  initial_state: true
   trigger:
     platform: event
     event_type: zwave.scene_activated
@@ -147,8 +147,8 @@
     service: light.turn_on
     entity_id: light.basement
 
-- alias: "Movie start"
-  hide_entity: true
+- alias: "Media start"
+  initial_state: true
   trigger:
     - platform: event
       event_type: zwave.scene_activated
@@ -161,21 +161,26 @@
       from: 'off'
       to: 'on'
   action:
-    - service: scene.turn_on
-      entity_id: scene.movie
+    - service: script.turn_on
+      entity_id: script.media_start
 
-- alias: "Movie end"
-  hide_entity: true
+- alias: "Media pause"
+  initial_state: true
   trigger:
     - platform: state
       entity_id: media_player.room1_main
       from: 'on'
       to: 'off'
+  condition:
+    condition: state
+    entity_id: light.basement_lamp
+    state: 'on'
   action:
-    - service: light.turn_on
-      entity_id: light.basement
+    - service: script.turn_on
+      entity_id: script.media_pause
 
 - alias: "Vacation - turn on lights at sunset"
+  initial_state: true
   trigger:
     - platform: sun
       event: sunset
@@ -188,6 +193,7 @@
       entity_id: script.livingroom_normal
 
 - alias: "Vacation - bedroom lights on"
+  initial_state: true
   trigger:
     - platform: time
       at: '21:00:00'
@@ -200,6 +206,7 @@
       entity_id: script.bedroom_normal
 
 - alias: "Vacation - go to bed"
+  initial_state: true
   trigger:
     - platform: time
       at: '00:00:00'
@@ -212,3 +219,21 @@
       entity_id: scene.bedroom_dim
     - service: light.turn_off
       entity_id: light.livingroom
+
+- alias: Turn on front door light
+  initial_state: true
+  trigger:
+    - platform: sun
+      event: sunset
+  action:
+    - service: light.turn_on
+      entity_id: light.front_door
+
+- alias: Turn off front door light
+  initial_state: true
+  trigger:
+    - platform: sun
+      event: sunrise
+  action:
+    - service: light.turn_off
+      entity_id: light.front_door

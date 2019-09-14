@@ -4,5 +4,7 @@ OZW_Log.txt
 home-assistant.log
 home-assistant_v2.db
 pyozw.sqlite
-secrets.yaml
-options.xml
+.storage/
+
+__pycache__/
+*.pyc
