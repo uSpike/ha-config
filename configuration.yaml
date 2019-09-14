@@ -181,7 +181,7 @@ media_player:
     host: 10.52.110.12
   - platform: panasonic_viera
     host: 10.52.110.10
-    mac: c0:d9:62:ae:17:1a 
+    mac: c0:d9:62:ae:17:1a
   - platform: snapcast
     host: 192.168.1.40
     #  - platform: mpd
