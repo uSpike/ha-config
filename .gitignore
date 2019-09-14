@@ -5,6 +5,7 @@ home-assistant.log
 home-assistant_v2.db
 pyozw.sqlite
 .storage/
+zwcfg*.xml
 
 __pycache__/
 *.pyc
