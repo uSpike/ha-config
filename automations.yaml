@@ -132,7 +132,7 @@
       scene_data: 0 # tap
   action:
     service: light.turn_off
-    entity_id: light.basement
+    entity_id: light.basement_lamp
 
 - alias: "Basement lights on"
   initial_state: true
@@ -145,7 +145,24 @@
       scene_data: 0 # tap
   action:
     service: light.turn_on
-    entity_id: light.basement
+    entity_id: light.basement_lamp
+
+- alias: "Basement light brightness"
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: light.basement_overhead
+  condition:
+      condition: numeric_state
+      entity_id: light.basement_overhead
+      above: 15
+      value_template: "{{ state_attr('light.basement_overhead', 'brightness')|default(0) }}"
+  action:
+    - service: light.turn_on
+      entity_id: light.basement_lamp
+      data_template:
+        brightness: "{{ states.light.basement_overhead.attributes.brightness }}"
+
 
 - alias: "Media start"
   initial_state: true
@@ -173,11 +190,13 @@
       to: 'off'
   condition:
     condition: state
-    entity_id: light.basement_lamp
+    entity_id: light.basement
     state: 'on'
   action:
     - service: script.turn_on
       entity_id: script.media_pause
+
+
 
 - alias: "Vacation - turn on lights at sunset"
   initial_state: true
@@ -237,3 +256,31 @@
   action:
     - service: light.turn_off
       entity_id: light.front_door
+
+- alias: Update Available Notification
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.updater
+      from: 'off'
+      to: 'on'
+  action:
+    - service: notify.notify
+      data_template:
+        message: "Home Assistant {{ state_attr('binary_sensor.updater', 'newest_version') }} is available."
+
+- alias: Turn livingroom receiver on
+  trigger:
+    - platform: state
+      entity_id: media_player.snapcast_group_4f0c7112_c9d6_cb08_aac4_d758bdd42498
+      to: 'on'
+  action:
+    - service: media_player.turn_on
+      entity_id: media_player.livingroom_receiver_main
+    - service: media_player.select_source
+      entity_id: media_player.livingroom_receiver_main
+      data:
+        source: coaxial
+    - service: media_player.volume_set
+      entity_id: media_player.livingroom_receiver_main
+      data:
+        volume_level: 0.5
