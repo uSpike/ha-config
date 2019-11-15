@@ -1,0 +1,302 @@
+
+# NZW3x
+#
+# Action            scene_id     scene_data
+# Double tap down   1            3
+# Triple tap down   1            4
+# Quad tap down     1            5
+# Five tap down     1            6
+# Long hold down    1            1
+#
+# Double tap up     2            3
+# Triple tap up     2            4
+# Quad tap up       2            5
+# Five tap up       2            6
+# Long hold up      2            1
+
+# LZW3x
+#
+# Button Press   Scene ID     Scene Data
+# 1 x Up         2            7680
+# 1 x Down       1            7680
+# 2 x Up         2            7860
+# 2 x Down       1            7860
+# 3 x Up         2            7920
+# 3 x Down       1            7920
+# 4 x Up         2            7980
+# 4 x Down       1            7980
+# 5 x Up         2            8040
+# 5 x Down       1            8040
+# 1 x Config     3            7680
+# Hold Up        2            7800
+# Release Up     2            7740
+# Hold Down      1            7800
+# Release Down   1            7740
+
+# Hank
+#
+# Action                Pictogram         scene_id     scene_data
+# Button one tap        Moon and Star     1            0
+# Button one hold       Moon and Star     1            2
+# Button one release    Moon and Star     1            1
+# Button two tap        People            2            0
+# Button two hold       People            2            2
+# Button two release    People            2            1
+# Button three tap      Circle            3            0
+# Button three hold     Circle            3            2
+# Button three release  Circle            3            1
+# Button four tap       Circle with Line  4            0
+# Button four hold      Circle with Line  4            2
+# Button four release   Circle with Line  4            1
+
+lifx:
+  light:
+    server: 10.52.100.11
+
+light:
+  - platform: switch
+    name: Livingroom Switch
+    entity_id: switch.livingroom_light
+
+  - platform: group
+    name: Livingroom Fixture
+    entities:
+      - light.livingroom_fixture_1
+      - light.livingroom_fixture_2
+      - light.livingroom_fixture_3
+
+  - platform: group
+    name: Livingroom
+    entities:
+      - light.livingroom_switch
+      - light.livingroom_fixture
+      - light.livingroom_entry_table
+
+  - platform: group
+    name: Bedroom
+    entities:
+      - light.bedroom_1
+      - light.bedroom_2
+
+  - platform: group
+    name: Basement
+    entities:
+      - light.basement_overhead
+      - light.basement_lamp
+
+  - platform: switch
+    name: Office Right Fixture
+    entity_id: switch.plug_office_ch0
+
+  - platform: switch
+    name: Office Left Fixture
+    entity_id: switch.plug_office_ch1
+
+  - platform: group
+    name: Office
+    entities:
+      - light.office_right_fixture
+      - light.office_left_fixture
+
+switch:
+  - platform: flux
+    name: Bedroom Flux
+    lights:
+      - light.bedroom
+    start_time: '7:00'
+    stop_time: '22:00'
+    start_colortemp: 2700
+    stop_colortemp: 2200
+    sunset_colortemp: 2500
+    mode: mired
+    transition: 1
+    interval: 120
+    brightness: 150
+
+  - platform: flux
+    name: Livingroom Flux
+    lights:
+      - light.livingroom
+    start_time: '7:00'
+    stop_time: '22:00'
+    start_colortemp: 2700
+    stop_colortemp: 2000
+    sunset_colortemp: 2200
+    mode: mired
+    transition: 1
+    interval: 120
+    brightness: 150
+
+script:
+  livingroom_bright:
+    alias: Livingroom Bright
+    sequence:
+      - service: switch.turn_off
+        entity_id: switch.livingroom_flux
+      - service: light.turn_on
+        entity_id: light.livingroom
+        data:
+          transition: 1
+          brightness_pct: 90
+          kelvin: 2700
+
+  livingroom_normal:
+    alias: Livingroom Normal
+    sequence:
+      - service: light.turn_on
+        entity_id: light.livingroom
+      - service: switch.turn_on
+        entity_id: switch.livingroom_flux
+      - service: switch.livingroom_flux_update
+        entity_id: switch.livingroom_flux
+
+  livingroom_dim:
+    alias: Livingroom Dim
+    sequence:
+      - service: switch.turn_off
+        entity_id: switch.livingroom_flux
+      - service: light.turn_on
+        entity_id: light.livingroom
+        data:
+          transition: 1
+          brightness_pct: 15
+          kelvin: 2000
+
+automation:
+  - alias: "Livingroom lights on"
+    initial_state: true
+    trigger:
+      platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.switch_livingroom_light
+        scene_id: 2 # up
+        scene_data: 0 # tap
+    action:
+      service: script.turn_on
+      entity_id: script.livingroom_normal
+
+  - alias: "Livingroom lights off"
+    initial_state: true
+    trigger:
+      platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.switch_livingroom_light
+        scene_id: 1 # down
+        scene_data: 0 # tap
+    action:
+      service: light.turn_off
+      entity_id: light.livingroom
+
+  - alias: "Livingroom lights full"
+    initial_state: true
+    trigger:
+      platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.switch_livingroom_light
+        scene_id: 2 # up
+        scene_data: 3 # double-tap
+    action:
+      service: script.turn_on
+      entity_id: script.livingroom_bright
+
+  - alias: "Livingroom lights dim"
+    initial_state: true
+    trigger:
+      platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.switch_livingroom_light
+        scene_id: 1 # down
+        scene_data: 3 # double-tap
+    action:
+      service: script.turn_on
+      entity_id: script.livingroom_dim
+
+  - alias: "Office lights on"
+    initial_state: true
+    trigger:
+      platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.switch_office
+        scene_id: 2 # up
+        scene_data: 0 # tap
+    action:
+      service: light.turn_on
+      entity_id: light.office
+
+  - alias: "Office lights off"
+    initial_state: true
+    trigger:
+      platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.switch_office
+        scene_id: 1 # down
+        scene_data: 0 # tap
+    action:
+      service: light.turn_off
+      entity_id: light.office
+
+  - alias: "Basement lights off"
+    initial_state: true
+    trigger:
+      platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.switch_basement
+        scene_id: 1 # down
+        scene_data: 0 # tap
+    action:
+      service: light.turn_off
+      entity_id: light.basement_lamp
+
+  - alias: "Basement lights on"
+    initial_state: true
+    trigger:
+      platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.switch_basement
+        scene_id: 2 # up
+        scene_data: 0 # tap
+    action:
+      service: light.turn_on
+      entity_id: light.basement_lamp
+
+  - alias: "Basement light brightness"
+    initial_state: true
+    trigger:
+      - platform: state
+        entity_id: light.basement_overhead
+    condition:
+        condition: numeric_state
+        entity_id: light.basement_overhead
+        above: 15
+        value_template: "{{ state_attr('light.basement_overhead', 'brightness')|default(0) }}"
+    action:
+      - service: light.turn_on
+        entity_id: light.basement_lamp
+        data_template:
+          brightness: "{{ states.light.basement_overhead.attributes.brightness }}"
+
+  - alias: Turn on front door light
+    initial_state: true
+    trigger:
+      - platform: sun
+        event: sunset
+    action:
+      - service: light.turn_on
+        entity_id: light.front_door
+
+  - alias: Turn off front door light
+    initial_state: true
+    trigger:
+      - platform: sun
+        event: sunrise
+    action:
+      - service: light.turn_off
+        entity_id: light.front_door

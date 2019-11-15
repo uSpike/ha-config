@@ -1,203 +1,3 @@
-
-# The scene_id and scene_data for the NZW30 are as follows:
-# 
-# Action            scene_id     scene_data
-# Double tap down      1             3
-# Triple tap down      1             4
-# Quad tap down        1             5
-# Five tap down        1             6
-# Long hold down       1             1
-# 
-# Double tap up        2             3
-# Triple tap up        2             4
-# Quad tap up          2             5
-# Five tap up          2             6
-# Long hold up         2             1
-
-# Hank
-#
-# Action         Pictogram         scene_id     scene_data
-# Button one tap     Moon and Star         1         0
-# Button one hold     Moon and Star         1         2
-# Button one release     Moon and Star         1         1
-# Button two tap     People             2         0
-# Button two hold     People             2         2
-# Button two release     People             2         1
-# Button three tap     Circle             3         0
-# Button three hold     Circle             3         2
-# Button three release     Circle             3         1
-# Button four tap     Circle with Line     4         0
-# Button four hold     Circle with Line     4         2
-# Button four release     Circle with Line     4         1
-
-
-#- alias: "Living room lights on"
-#  trigger:
-#    platform: event
-#    event_type: zwave.scene_activated
-#    event_data:
-#      entity_id: zwave.switch_livingroom_light
-#      scene_id: 2 # double tap up
-#      scene_data: 3
-#  action:
-#    service: scene.turn_on
-#    entity_id: scene.livingroom_lights_on
-    
-- alias: "Livingroom lights on"
-  initial_state: true
-  trigger:
-    platform: event
-    event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.switch_livingroom_light
-      scene_id: 2 # up
-      scene_data: 0 # tap
-  action:
-    service: script.turn_on
-    entity_id: script.livingroom_normal
-    
-- alias: "Livingroom lights off"
-  initial_state: true
-  trigger:
-    platform: event
-    event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.switch_livingroom_light
-      scene_id: 1 # down
-      scene_data: 0 # tap
-  action:
-    service: light.turn_off
-    entity_id: light.livingroom
-    
-- alias: "Livingroom lights full"
-  initial_state: true
-  trigger:
-    platform: event
-    event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.switch_livingroom_light
-      scene_id: 2 # up
-      scene_data: 3 # double-tap
-  action:
-    service: script.turn_on
-    entity_id: script.livingroom_bright
-
-- alias: "Livingroom lights dim"
-  initial_state: true
-  trigger:
-    platform: event
-    event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.switch_livingroom_light
-      scene_id: 1 # down
-      scene_data: 3 # double-tap
-  action:
-    service: script.turn_on
-    entity_id: script.livingroom_dim
-    
-- alias: "Office lights on"
-  initial_state: true
-  trigger:
-    platform: event
-    event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.switch_office
-      scene_id: 2 # up
-      scene_data: 0 # tap
-  action:
-    service: light.turn_on
-    entity_id: light.office
-
-- alias: "Office lights off"
-  initial_state: true
-  trigger:
-    platform: event
-    event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.switch_office
-      scene_id: 1 # down
-      scene_data: 0 # tap
-  action:
-    service: light.turn_off
-    entity_id: light.office
-
-- alias: "Basement lights off"
-  initial_state: true
-  trigger:
-    platform: event
-    event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.switch_basement
-      scene_id: 1 # down
-      scene_data: 0 # tap
-  action:
-    service: light.turn_off
-    entity_id: light.basement_lamp
-
-- alias: "Basement lights on"
-  initial_state: true
-  trigger:
-    platform: event
-    event_type: zwave.scene_activated
-    event_data:
-      entity_id: zwave.switch_basement
-      scene_id: 2 # up
-      scene_data: 0 # tap
-  action:
-    service: light.turn_on
-    entity_id: light.basement_lamp
-
-- alias: "Basement light brightness"
-  initial_state: true
-  trigger:
-    - platform: state
-      entity_id: light.basement_overhead
-  condition:
-      condition: numeric_state
-      entity_id: light.basement_overhead
-      above: 15
-      value_template: "{{ state_attr('light.basement_overhead', 'brightness')|default(0) }}"
-  action:
-    - service: light.turn_on
-      entity_id: light.basement_lamp
-      data_template:
-        brightness: "{{ states.light.basement_overhead.attributes.brightness }}"
-
-
-- alias: "Media start"
-  initial_state: true
-  trigger:
-    - platform: event
-      event_type: zwave.scene_activated
-      event_data:
-        entity_id: zwave.switch_basement
-        scene_id: 1 # down
-        scene_data: 3 # double-tap
-    - platform: state
-      entity_id: media_player.room1_main
-      from: 'off'
-      to: 'on'
-  action:
-    - service: script.turn_on
-      entity_id: script.media_start
-
-- alias: "Media pause"
-  initial_state: true
-  trigger:
-    - platform: state
-      entity_id: media_player.room1_main
-      from: 'on'
-      to: 'off'
-  condition:
-    condition: state
-    entity_id: light.basement
-    state: 'on'
-  action:
-    - service: script.turn_on
-      entity_id: script.media_pause
-
-
-
 - alias: "Vacation - turn on lights at sunset"
   initial_state: true
   trigger:
@@ -239,24 +39,6 @@
     - service: light.turn_off
       entity_id: light.livingroom
 
-- alias: Turn on front door light
-  initial_state: true
-  trigger:
-    - platform: sun
-      event: sunset
-  action:
-    - service: light.turn_on
-      entity_id: light.front_door
-
-- alias: Turn off front door light
-  initial_state: true
-  trigger:
-    - platform: sun
-      event: sunrise
-  action:
-    - service: light.turn_off
-      entity_id: light.front_door
-
 - alias: Update Available Notification
   trigger:
     - platform: state
@@ -268,19 +50,55 @@
       data_template:
         message: "Home Assistant {{ state_attr('binary_sensor.updater', 'newest_version') }} is available."
 
-- alias: Turn livingroom receiver on
+- alias: Garage Door Open Set Switch Color
   trigger:
     - platform: state
-      entity_id: media_player.snapcast_group_4f0c7112_c9d6_cb08_aac4_d758bdd42498
+      entity_id: binary_sensor.garage_tilt_sensor
       to: 'on'
   action:
-    - service: media_player.turn_on
-      entity_id: media_player.livingroom_receiver_main
-    - service: media_player.select_source
-      entity_id: media_player.livingroom_receiver_main
+    - service: script.zwave_inovelli_led_color
       data:
-        source: coaxial
-    - service: media_player.volume_set
-      entity_id: media_player.livingroom_receiver_main
+        nodeid: 23
+        color: 'red'
+        duration: 'on'
+        effect: pulse
+        level: 100
+
+- alias: Garage Door Close Set Switch Color
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.garage_tilt_sensor
+      to: 'off'
+  action:
+    - service: script.zwave_inovelli_led_color
       data:
-        volume_level: 0.5
+        nodeid: 23
+        duration: 'off'
+        effect: 'off'
+
+- alias: "Media start"
+  initial_state: true
+  trigger:
+    - platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.switch_basement
+        scene_id: 1 # down
+        scene_data: 3 # double-tap
+  action:
+    - service: script.media_start
+
+- alias: "Media pause"
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: media_player.room1_main
+      from: 'on'
+      to: 'off'
+  condition:
+    condition: state
+    entity_id: light.basement
+    state: 'on'
+  action:
+    - service: script.turn_on
+      entity_id: script.media_pause

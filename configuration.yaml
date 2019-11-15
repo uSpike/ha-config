@@ -15,6 +15,12 @@ homeassistant:
   customize:
     binary_sensor.garage_tilt_sensor:
       device_class: door
+  auth_providers:
+    - type: homeassistant
+    - type: trusted_networks
+      trusted_networks:
+        - 192.168.1.0/24
+  packages: !include_dir_named packages
 
 zone:
   - name: Home
@@ -34,7 +40,7 @@ updater:
   include_used_components: false
 
 hacs:
-  token: 30274465c1f41b33693813753c3307edc2bd57f2
+  token: !secret hacs_token
 
 recorder:
   db_url: postgresql://@/ha
@@ -134,7 +140,6 @@ binary_sensor:
         value_template: "{{ is_state('sensor.bedroom_door_alarm_level', '255') }}"
         friendly_name: 'Bedroom Door'
 
-
 http:
   server_host: 127.0.0.1
   base_url: https://ha.jkhome.network
@@ -158,152 +163,45 @@ logger:
 sun:
 
 zwave:
-  #config_path: /srv/homeassistant/config/open-zwave/config
+  config_path: /srv/homeassistant/config/open-zwave/config
   usb_path: /dev/ttyACM0
   autoheal: false
   polling_interval: 30000
 
-lifx:
-  light:
-    server: 10.52.100.11
-
-light:
-  - platform: switch
-    name: Livingroom Switch
-    entity_id: switch.livingroom_light
-  - platform: group
-    name: Livingroom Fixture
-    entities:
-      - light.livingroom_fixture_1
-      - light.livingroom_fixture_2
-      - light.livingroom_fixture_3
-  - platform: group
-    name: Livingroom
-    entities:
-      - light.livingroom_switch
-      - light.livingroom_fixture
-      - light.livingroom_entry_table
-  - platform: group
-    name: Bedroom
-    entities:
-      - light.bedroom_1
-      - light.bedroom_2
-  - platform: group
-    name: Basement
-    entities:
-      - light.basement_overhead
-      - light.basement_lamp
-  - platform: switch
-    name: Office Right Fixture
-    entity_id: switch.plug_office_ch0
-  - platform: switch
-    name: Office Left Fixture
-    entity_id: switch.plug_office_ch1
-  - platform: group
-    name: Office
-    entities:
-      - light.office_right_fixture
-      - light.office_left_fixture
-
-switch:
-  - platform: flux
-    name: Bedroom Flux
-    lights:
-      - light.bedroom
-    start_time: '7:00'
-    stop_time: '22:00'
-    start_colortemp: 2700
-    stop_colortemp: 2200
-    sunset_colortemp: 2500
-    mode: mired
-    transition: 1
-    interval: 120
-    brightness: 150
-  - platform: flux
-    name: Livingroom Flux
-    lights:
-      - light.livingroom
-    start_time: '7:00'
-    stop_time: '22:00'
-    start_colortemp: 2700
-    stop_colortemp: 2000
-    sunset_colortemp: 2200
-    mode: mired
-    transition: 1
-    interval: 120
-    brightness: 150
-
-
-
-media_player:
-  - platform: yamaha_musiccast
-    host: 10.52.110.12
-    port: 5005
-  - platform: yamaha_musiccast
-    host: 10.52.110.14
-    port: 5006
-  - platform: panasonic_viera
-    host: 10.52.110.10
-    mac: c0:d9:62:ae:17:1a
-    name: "Basement TV"
-  - platform: snapcast
-    host: 192.168.1.40
-  #- platform: mpd
-  #  host: 192.168.1.99
-  #- name: Jordan Spotify
-  #  platform: spotify
-  #  client_id: ec374d9d19c848949af1af9f588a0871
-  #  client_secret: 2566509f7a6e426dbf3e21081d872f3d
-  #  cache_path: /srv/homeassistant/config/.spotify-token-cache-jordan
-  #- name: Kristen Spotify
-  #  platform: spotify
-  #  client_id: a591978a38214a3cb6cc91f32a8731f4
-  #  client_secret: 8425eeae132f41d18e10be24e3dd5f52
-  #  cache_path: /srv/homeassistant/config/.spotify-token-cache-kristen
-
 roku:
   - host: 10.52.110.13
 
+
+media_player:
+  - platform: panasonic_viera
+    host: 10.52.110.10
+    broadcast_address: 10.52.110.255
+    mac: 8c:c1:21:60:64:f0
+    name: "Basement TV"
+
 script:
-  livingroom_bright:
-    alias: Livingroom Bright
-    sequence:
-      - service: switch.turn_off
-        entity_id: switch.livingroom_flux
-      - service: light.turn_on
-        entity_id: light.livingroom
-        data:
-          transition: 1
-          brightness_pct: 90
-          kelvin: 2700
-  livingroom_normal:
-    alias: Livingroom Normal
-    sequence:
-      - service: light.turn_on
-        entity_id: light.livingroom
-      - service: switch.turn_on
-        entity_id: switch.livingroom_flux
-      - service: switch.livingroom_flux_update
-        entity_id: switch.livingroom_flux
-  livingroom_dim:
-    alias: Livingroom Dim
-    sequence:
-      - service: switch.turn_off
-        entity_id: switch.livingroom_flux
-      - service: light.turn_on
-        entity_id: light.livingroom
-        data:
-          transition: 1
-          brightness_pct: 15
-          kelvin: 2000
   media_start:
-    alias: Media Play
     sequence:
       - service: light.turn_on
         data:
           entity_id: light.basement
-          transition: 2
-          brightness: 25
+          transition: 1
+          brightness: 150
+      - service: media_player.turn_on
+        data:
+          entity_id: media_player.basement_tv
+      - delay: '00:00:05'
+      - service: media_player.select_source
+        data:
+          entity_id: media_player.basement_receiver_main
+          source: 'hdmi2'  # roku
+      - delay: '00:00:20'
+      - service: light.turn_on
+        data:
+          entity_id: light.basement
+          transition: 10
+          brightness: 3
+
   media_pause:
     alias: Media Pause
     sequence:
@@ -312,6 +210,65 @@ script:
           entity_id: light.basement
           transition: 2
           brightness: 255
+
+  zwave_inovelli_led_color:
+    alias: Change LED color on Inovelli Switch
+    sequence:
+      - service: zwave.set_config_parameter
+        data_template:
+          node_id: '{{ nodeid }}'
+          parameter: 16
+          size: 4
+          value: >
+            {% if color is number and color >= 0 and color <= 255 %}
+              {% set hx = color %}
+            {% elif color == "red" %}
+              {% set hx = 1 %}
+            {% elif color == "orange" %}
+              {% set hx = 21 %}
+            {% elif color == "green" %}
+              {% set hx = 85 %}
+            {% elif color == "blue" %}
+              {% set hx = 170 %}
+            {% elif color == "pink" %}
+              {% set hx = 234 %}
+            {% elif color == "yellow" %}
+              {% set hx = 42 %}
+            {% else %}
+              {% set hx = 127 %}
+            {% endif %}
+            {% if level is number and level >= 0 and level <= 10 %}
+              {% set lx = level %}
+            {% else %}
+              {% set lx = 10 %}
+            {% endif %}
+            {% if duration is number %}
+              {% if duration >= 0 and duration <= 255 %}
+                {% set dx = duration %}
+              {% else %}
+                {% set dx = 10 %}
+              {% endif %}
+            {% elif duration == "on" %}
+              {% set dx = 255 %}
+            {% else %}
+              {% set dx = 10 %}
+            {% endif %}
+            {% if effect is number and effect >= 0 and effect <= 4 %}
+              {% set ex = effect %}
+            {% elif effect == "off" %}
+              {% set ex = 0 %}
+            {% elif effect == "solid" %}
+              {% set ex = 1 %}
+            {% elif effect == "fast_blink" %}
+              {% set ex = 2 %}
+            {% elif effect == "strobe" %}
+              {% set ex = 2 %}
+            {% elif effect == "slow_blink" %}
+              {% set ex = 3 %}
+            {% else %}
+              {% set ex = 4 %}
+            {% endif %}
+            {{( (hx) + (lx * (2**8)) + (dx * (2**16)) + (ex * (2**24))) | int}}
 
 input_boolean:
   vacation:

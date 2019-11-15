@@ -1,7 +1,0 @@
-resources:
-  - type: module
-    url: /local/mini-media-player-bundle.js?v=1.4.1
-  - type: module
-    url: /local/slider-entity-row.js?v=7
-  - type: module
-    url: /local/spotify-card.js?v=1.9

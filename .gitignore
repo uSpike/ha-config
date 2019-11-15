@@ -9,3 +9,5 @@ zwcfg*.xml
 
 __pycache__/
 *.pyc
+
+www/
