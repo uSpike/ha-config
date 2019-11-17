@@ -32,6 +32,7 @@ media_player:
       - media_player.snapcast_group_home
       - media_player.snapcast_client_kitchen
       - media_player.snapcast_client_livingroom
+      - media_player.snapcast_client_basement
       - media_player.livingroom_receiver_main
     state_template: >
       {% if is_state('input_boolean.audio', 'on') %}
@@ -113,6 +114,12 @@ script:
         entity_id: media_player.livingroom_receiver_main
         data:
           source: coaxial
+      - service: media_player.turn_on
+        entity_id: media_player.basement_receiver_main
+      - service: media_player.select_source
+        entity_id: media_player.basement_receiver_main
+        data:
+          source: aux
       - service: input_boolean.turn_on
         entity_id: input_boolean.audio
   audio_turn_off:
@@ -123,6 +130,12 @@ script:
           is_volume_muted: true
       - service: media_player.turn_off
         entity_id: media_player.livingroom_receiver_main
+      - service: media_player.select_source
+        entity_id: media_player.basement_receiver_main
+        data:
+          source: hdmi2
+      - service: media_player.turn_off
+        entity_id: media_player.basement_receiver_main
       - service: input_boolean.turn_off
         entity_id: input_boolean.audio
   audio_default_volume:
@@ -136,7 +149,15 @@ script:
         data:
           volume_level: 1.0
       - service: media_player.volume_set
+        entity_id: media_player.snapcast_client_basement
+        data:
+          volume_level: 1.0
+      - service: media_player.volume_set
         entity_id: media_player.livingroom_receiver_main
+        data:
+          volume_level: 0.3
+      - service: media_player.volume_set
+        entity_id: media_player.basement_receiver_main
         data:
           volume_level: 0.3
 
@@ -167,8 +188,13 @@ automation:
       - service: media_player.volume_set
         entity_id: media_player.livingroom_receiver_main
         data_template:
-          # minimum volume is 0.2, max is 0.7
-          volume_level: '{{ (states("input_number.audio_volume")|float * 0.5) + 0.2 }}'
+          # minimum volume is 0.4, max is 0.7
+          volume_level: '{{ (states("input_number.audio_volume")|float * 0.3) + 0.4 }}'
+      - service: media_player.volume_set
+        entity_id: media_player.basement_receiver_main
+        data_template:
+          # minimum volume is 0.65, max is 1.0
+          volume_level: '{{ (states("input_number.audio_volume")|float * 0.35) + 0.65 }}'
 
   - alias: Start Mopidy
     trigger:
@@ -198,10 +224,14 @@ automation:
         entity_id: media_player.jordan_spotify
         data:
           source: Snapcast
+      - delay:
+          seconds: 1
       - service: media_player.volume_set
         entity_id: media_player.jordan_spotify
         data:
           volume_level: 1.0
+      - delay:
+          seconds: 1
       - service: media_player.media_play
         entity_id: media_player.jordan_spotify
 
@@ -224,10 +254,14 @@ automation:
         entity_id: media_player.kristen_spotify
         data:
           source: Snapcast
+      - delay:
+          seconds: 1
       - service: media_player.volume_set
         entity_id: media_player.kristen_spotify
         data:
           volume_level: 1.0
+      - delay:
+          seconds: 1
       - service: media_player.media_play
         entity_id: media_player.kristen_spotify
 
