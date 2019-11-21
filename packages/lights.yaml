@@ -264,8 +264,12 @@ automation:
         scene_id: 2 # up
         scene_data: 0 # tap
     action:
-      service: light.turn_on
-      entity_id: light.basement_lamp
+      - service: light.turn_on
+        entity_id: light.basement_lamp
+      - service: light.turn_on
+        entity_id: light.basement
+        data:
+          brightness_pct: 100
 
   - alias: "Basement light brightness"
     initial_state: true
