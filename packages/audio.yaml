@@ -8,10 +8,12 @@ media_player:
     port: 5006
 
   - platform: snapcast
-    host: 192.168.1.12
+    #host: 192.168.1.12
+    host: 192.168.1.40
 
   - platform: mpd
     host: 192.168.1.12
+    #host: 192.168.1.40
     name: "Mopidy"
 
   - name: Jordan Spotify
@@ -32,20 +34,11 @@ media_player:
       - media_player.snapcast_group_home
       - media_player.snapcast_client_kitchen
       - media_player.snapcast_client_livingroom
-      - media_player.snapcast_client_basement
+      #- media_player.snapcast_client_basement
       - media_player.livingroom_receiver_main
     state_template: >
       {% if is_state('input_boolean.audio', 'on') %}
-        {% set source = state_attr('media_player.snapcast_group_home', 'source') %}
-        {% if source == 'Mopidy' %}
-        {{ states('media_player.mopidy') }}
-        {% elif source == 'Spotify_Jordan' %}
-        {{ states('media_player.jordan_spotify') }}
-        {% elif source == 'Spotify_Kristen' %}
-        {{ states('media_player.kristen_spotify') }}
-        {% else %}
-        Unknown
-        {% endif %}
+      on
       {% else %}
       off
       {% endif %}
@@ -114,12 +107,12 @@ script:
         entity_id: media_player.livingroom_receiver_main
         data:
           source: coaxial
-      - service: media_player.turn_on
-        entity_id: media_player.basement_receiver_main
-      - service: media_player.select_source
-        entity_id: media_player.basement_receiver_main
-        data:
-          source: aux
+      #- service: media_player.turn_on
+      #  entity_id: media_player.basement_receiver_main
+      #- service: media_player.select_source
+      #  entity_id: media_player.basement_receiver_main
+      #  data:
+      #    source: aux
       - service: input_boolean.turn_on
         entity_id: input_boolean.audio
   audio_turn_off:
@@ -128,14 +121,14 @@ script:
         entity_id: media_player.snapcast_group_home
         data:
           is_volume_muted: true
-      - service: media_player.turn_off
-        entity_id: media_player.livingroom_receiver_main
-      - service: media_player.select_source
-        entity_id: media_player.basement_receiver_main
-        data:
-          source: hdmi2
-      - service: media_player.turn_off
-        entity_id: media_player.basement_receiver_main
+      #- service: media_player.turn_off
+      #  entity_id: media_player.livingroom_receiver_main
+      #- service: media_player.select_source
+      #  entity_id: media_player.basement_receiver_main
+      #  data:
+      #    source: hdmi2
+      #- service: media_player.turn_off
+      #  entity_id: media_player.basement_receiver_main
       - service: input_boolean.turn_off
         entity_id: input_boolean.audio
   audio_default_volume:
@@ -156,10 +149,28 @@ script:
         entity_id: media_player.livingroom_receiver_main
         data:
           volume_level: 0.3
+      #- service: media_player.volume_set
+      #  entity_id: media_player.basement_receiver_main
+      #  data:
+      #    volume_level: 0.3
+  start_spotify:
+    sequence:
+      - service: media_player.select_source
+        data_template:
+          entity_id: '{{ entity_id }}'
+          source: Snapcast
+      - delay:
+          seconds: 1
       - service: media_player.volume_set
-        entity_id: media_player.basement_receiver_main
-        data:
-          volume_level: 0.3
+        data_template:
+          entity_id: '{{ entity_id }}'
+          volume_level: 1.0
+      - delay:
+          seconds: 1
+      - service: media_player.media_play
+        data_template:
+          entity_id: '{{ entity_id }}'
+
 
 binary_sensor:
   - platform: template
@@ -190,11 +201,11 @@ automation:
         data_template:
           # minimum volume is 0.4, max is 0.7
           volume_level: '{{ (states("input_number.audio_volume")|float * 0.3) + 0.4 }}'
-      - service: media_player.volume_set
-        entity_id: media_player.basement_receiver_main
-        data_template:
-          # minimum volume is 0.65, max is 1.0
-          volume_level: '{{ (states("input_number.audio_volume")|float * 0.35) + 0.65 }}'
+      #- service: media_player.volume_set
+      #  entity_id: media_player.basement_receiver_main
+      #  data_template:
+      #    # minimum volume is 0.65, max is 1.0
+      #    volume_level: '{{ (states("input_number.audio_volume")|float * 0.35) + 0.65 }}'
 
   - alias: Start Mopidy
     trigger:
@@ -202,6 +213,8 @@ automation:
       entity_id: binary_sensor.audio_use_mopidy
       to: 'on'
     action:
+      - service: media_player.turn_on
+        entity_id: media_player.home_audio
       - service: media_player.media_play
         entity_id: media_player.mopidy
 
@@ -220,20 +233,9 @@ automation:
       entity_id: binary_sensor.audio_use_jordan_spotify
       to: 'on'
     action:
-      - service: media_player.select_source
-        entity_id: media_player.jordan_spotify
+      - service: script.start_spotify
         data:
-          source: Snapcast
-      - delay:
-          seconds: 1
-      - service: media_player.volume_set
-        entity_id: media_player.jordan_spotify
-        data:
-          volume_level: 1.0
-      - delay:
-          seconds: 1
-      - service: media_player.media_play
-        entity_id: media_player.jordan_spotify
+          entity_id: media_player.jordan_spotify
 
   - alias: Stop Jordan Spotify
     trigger:
@@ -250,20 +252,9 @@ automation:
       entity_id: binary_sensor.audio_use_kristen_spotify
       to: 'on'
     action:
-      - service: media_player.select_source
-        entity_id: media_player.kristen_spotify
+      - service: script.start_spotify
         data:
-          source: Snapcast
-      - delay:
-          seconds: 1
-      - service: media_player.volume_set
-        entity_id: media_player.kristen_spotify
-        data:
-          volume_level: 1.0
-      - delay:
-          seconds: 1
-      - service: media_player.media_play
-        entity_id: media_player.kristen_spotify
+          entity_id: media_player.kristen_spotify
 
   - alias: Stop Kristen Spotify
     trigger:
@@ -274,3 +265,59 @@ automation:
       - service: media_player.media_pause
         entity_id: media_player.kristen_spotify
 
+  - alias: "Audio toggle on/off"
+    trigger:
+      platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.livingroom_button_controller
+        scene_id: 3 # circle (middle)
+        scene_data: 0 # tap
+    action:
+      service: media_player.toggle
+      entity_id: media_player.home_audio
+
+  - alias: "Audio play WPR"
+    trigger:
+      platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.livingroom_button_controller
+        scene_id: 2 # people
+        scene_data: 0 # tap
+    action:
+      - service: automation.trigger
+        entity_id: automation.start_mopidy
+      - service: media_player.play_media
+        entity_id: media_player.mopidy
+        data:
+          media_content_id: "https://wpr-ice.streamguys1.com/wpr-ideas-mp3-64"
+          media_content_type: channel
+
+  - alias: "Audio play Kristen Spotify"
+    trigger:
+      platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.livingroom_button_controller
+        scene_id: 4 # circle with line
+        scene_data: 0 # tap
+    action:
+      - service: media_player.turn_on
+        entity_id: media_player.home_audio
+      - service: automation.trigger
+        entity_id: automation.start_kristen_spotify
+
+  - alias: "Audio play Jordan Spotify"
+    trigger:
+      platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.livingroom_button_controller
+        scene_id: 1 # moon and star
+        scene_data: 0 # tap
+    action:
+      - service: media_player.turn_on
+        entity_id: media_player.home_audio
+      - service: automation.trigger
+        entity_id: automation.start_jordan_spotify
