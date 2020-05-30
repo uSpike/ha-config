@@ -1,4 +1,52 @@
 media_player:
+  - platform: wha
+    name: home
+    snapgroup: media_player.snapcast_group_71aecdd3_beac_781a_5e6b_f6e823e66f93
+    sources:
+      - name: "Spotify Jordan"
+        snapcast_source: "Spotify_Jordan"
+        entity_id: media_player.spotify_jordan
+        select_source: "Snapcast"
+      - name: "Spotify Kristen"
+        snapcast_source: "Spotify_Kristen"
+        entity_id: media_player.spotify_kristen
+        select_source: "Snapcast"
+      - name: "MPD"
+        snapcast_source: "MPD"
+        entity_id: media_player.mpd
+
+    speakers:
+      - name: livingroom
+        on_default: false
+        snapclient:
+          entity_id: media_player.snapcast_client_livingroom
+        receiver:
+          entity_id: media_player.livingroom_receiver_main
+          source: coaxial
+          volume:
+            min: 30
+            max: 70
+            default: 40
+      - name: kitchen
+        on_default: true
+        snapclient:
+          entity_id: media_player.snapcast_client_kitchen
+          volume:
+            min: 0
+            max: 40
+            default: 10
+      - name: basement
+        on_default: false
+        snapclient:
+          entity_id: media_player.snapcast_client_basement
+        receiver:
+          entity_id: media_player.dunno
+          source: aux
+          volume:
+            min: 20
+            max: 40
+            default: 25
+
   - platform: yamaha_musiccast
     host: 10.52.110.12
     port: 5005
@@ -8,316 +56,69 @@ media_player:
     port: 5006
 
   - platform: snapcast
-    #host: 192.168.1.12
-    host: 192.168.1.40
+    host: 192.168.1.12
 
   - platform: mpd
     host: 192.168.1.12
-    #host: 192.168.1.40
-    name: "Mopidy"
-
-  - name: Jordan Spotify
-    platform: spotify
-    client_id: !secret jordan_spotify_client_id
-    client_secret: !secret jordan_spotify_client_secret
-    cache_path: .spotify-token-cache-jordan
-
-  - name: Kristen Spotify
-    platform: spotify
-    client_id: !secret kristen_spotify_client_id
-    client_secret: !secret kristen_spotify_client_secret
-    cache_path: .spotify-token-cache-kristen
-
-  - platform: universal
-    name: Home Audio
-    children:
-      - media_player.snapcast_group_home
-      - media_player.snapcast_client_kitchen
-      - media_player.snapcast_client_livingroom
-      #- media_player.snapcast_client_basement
-      - media_player.livingroom_receiver_main
-    state_template: >
-      {% if is_state('input_boolean.audio', 'on') %}
-      on
-      {% else %}
-      off
-      {% endif %}
-    commands:
-      turn_on:
-        service: script.turn_on
-        data:
-          entity_id: script.audio_turn_on
-      turn_off:
-        service: script.turn_on
-        data:
-          entity_id: script.audio_turn_off
-      volume_set:
-        service: input_number.set_value
-        data_template:
-          entity_id: input_number.audio_volume
-          value: '{{ volume_level }}'
-      volume_mute:
-        service: media_player.volume_mute
-        data_template:
-          entity_id: media_player.snapcast_group_home
-          is_volume_muted: '{{ not state_attr("media_player.snapcast_group_home", "is_volume_muted") }}'
-      volume_up:
-        service: input_number.increment
-        data:
-          entity_id: input_number.audio_volume
-      volume_down:
-        service: input_number.decrement
-        data:
-          entity_id: input_number.audio_volume
-      select_source:
-        service: media_player.select_source
-        data_template:
-          entity_id: media_player.snapcast_group_home
-          source: '{{ source }}'
-    attributes:
-      volume_level: input_number.audio_volume
-      is_volume_muted: media_player.snapcast_group_home|is_volume_muted
-      source: media_player.snapcast_group_home|source
-      source_list: media_player.snapcast_group_home|source_list
-
-input_number:
-  audio_volume:
-    name: Audio Volume
-    initial: 0.2
-    min: 0
-    max: 1.0
-    step: 0.1
-
-input_boolean:
-  audio:
-    name: Audio On/Off
-
-script:
-  audio_turn_on:
-    sequence:
-      - service: script.turn_on
-        entity_id: script.audio_default_volume
-      - service: media_player.volume_mute
-        entity_id: media_player.snapcast_group_home
-        data:
-          is_volume_muted: false
-      - service: media_player.turn_on
-        entity_id: media_player.livingroom_receiver_main
-      - service: media_player.select_source
-        entity_id: media_player.livingroom_receiver_main
-        data:
-          source: coaxial
-      #- service: media_player.turn_on
-      #  entity_id: media_player.basement_receiver_main
-      #- service: media_player.select_source
-      #  entity_id: media_player.basement_receiver_main
-      #  data:
-      #    source: aux
-      - service: input_boolean.turn_on
-        entity_id: input_boolean.audio
-  audio_turn_off:
-    sequence:
-      - service: media_player.volume_mute
-        entity_id: media_player.snapcast_group_home
-        data:
-          is_volume_muted: true
-      #- service: media_player.turn_off
-      #  entity_id: media_player.livingroom_receiver_main
-      #- service: media_player.select_source
-      #  entity_id: media_player.basement_receiver_main
-      #  data:
-      #    source: hdmi2
-      #- service: media_player.turn_off
-      #  entity_id: media_player.basement_receiver_main
-      - service: input_boolean.turn_off
-        entity_id: input_boolean.audio
-  audio_default_volume:
-    sequence:
-      - service: media_player.volume_set
-        entity_id: media_player.snapcast_client_kitchen
-        data:
-          volume_level: 0.1
-      - service: media_player.volume_set
-        entity_id: media_player.snapcast_client_livingroom
-        data:
-          volume_level: 1.0
-      - service: media_player.volume_set
-        entity_id: media_player.snapcast_client_basement
-        data:
-          volume_level: 1.0
-      - service: media_player.volume_set
-        entity_id: media_player.livingroom_receiver_main
-        data:
-          volume_level: 0.3
-      #- service: media_player.volume_set
-      #  entity_id: media_player.basement_receiver_main
-      #  data:
-      #    volume_level: 0.3
-  start_spotify:
-    sequence:
-      - service: media_player.select_source
-        data_template:
-          entity_id: '{{ entity_id }}'
-          source: Snapcast
-      - delay:
-          seconds: 1
-      - service: media_player.volume_set
-        data_template:
-          entity_id: '{{ entity_id }}'
-          volume_level: 1.0
-      - delay:
-          seconds: 1
-      - service: media_player.media_play
-        data_template:
-          entity_id: '{{ entity_id }}'
+    port: 6600
 
 
-binary_sensor:
-  - platform: template
-    sensors:
-      audio_use_mopidy:
-        entity_id: media_player.home_audio
-        value_template: '{{ (not is_state("media_player.home_audio", "off")) and state_attr("media_player.home_audio", "source") == "Mopidy"}}'
-      audio_use_jordan_spotify:
-        entity_id: media_player.home_audio
-        value_template: '{{ (not is_state("media_player.home_audio", "off")) and state_attr("media_player.home_audio", "source") == "Spotify_Jordan"}}'
-      audio_use_kristen_spotify:
-        entity_id: media_player.home_audio
-        value_template: '{{ (not is_state("media_player.home_audio", "off")) and state_attr("media_player.home_audio", "source") == "Spotify_Kristen"}}'
+
+spotify:
+  client_id: !secret jordan_spotify_client_id
+  client_secret: !secret jordan_spotify_client_secret
+
 
 automation:
-  - alias: Set Audio Volume
-    trigger:
-      platform: state
-      entity_id: input_number.audio_volume
-    action:
-      - service: media_player.volume_set
-        entity_id: media_player.snapcast_client_kitchen
-        data_template:
-          # max volume is 0.3
-          volume_level: '{{ states("input_number.audio_volume")|float * 0.3 }}'
-      - service: media_player.volume_set
-        entity_id: media_player.livingroom_receiver_main
-        data_template:
-          # minimum volume is 0.4, max is 0.7
-          volume_level: '{{ (states("input_number.audio_volume")|float * 0.3) + 0.4 }}'
-      #- service: media_player.volume_set
-      #  entity_id: media_player.basement_receiver_main
-      #  data_template:
-      #    # minimum volume is 0.65, max is 1.0
-      #    volume_level: '{{ (states("input_number.audio_volume")|float * 0.35) + 0.65 }}'
-
-  - alias: Start Mopidy
-    trigger:
-      platform: state
-      entity_id: binary_sensor.audio_use_mopidy
-      to: 'on'
-    action:
-      - service: media_player.turn_on
-        entity_id: media_player.home_audio
-      - service: media_player.media_play
-        entity_id: media_player.mopidy
-
-  - alias: Stop Mopidy
-    trigger:
-      platform: state
-      entity_id: binary_sensor.audio_use_mopidy
-      to: 'off'
-    action:
-      - service: media_player.media_pause
-        entity_id: media_player.mopidy
-
-  - alias: Start Jordan Spotify
-    trigger:
-      platform: state
-      entity_id: binary_sensor.audio_use_jordan_spotify
-      to: 'on'
-    action:
-      - service: script.start_spotify
-        data:
-          entity_id: media_player.jordan_spotify
-
-  - alias: Stop Jordan Spotify
-    trigger:
-      platform: state
-      entity_id: binary_sensor.audio_use_jordan_spotify
-      to: 'off'
-    action:
-      - service: media_player.media_pause
-        entity_id: media_player.jordan_spotify
-
-  - alias: Start Kristen Spotify
-    trigger:
-      platform: state
-      entity_id: binary_sensor.audio_use_kristen_spotify
-      to: 'on'
-    action:
-      - service: script.start_spotify
-        data:
-          entity_id: media_player.kristen_spotify
-
-  - alias: Stop Kristen Spotify
-    trigger:
-      platform: state
-      entity_id: binary_sensor.audio_use_kristen_spotify
-      to: 'off'
-    action:
-      - service: media_player.media_pause
-        entity_id: media_player.kristen_spotify
-
-  - alias: "Audio toggle on/off"
-    trigger:
-      platform: event
-      event_type: zwave.scene_activated
-      event_data:
-        entity_id: zwave.livingroom_button_controller
-        scene_id: 3 # circle (middle)
-        scene_data: 0 # tap
-    action:
-      service: media_player.toggle
-      entity_id: media_player.home_audio
-
-  - alias: "Audio play WPR"
-    trigger:
-      platform: event
-      event_type: zwave.scene_activated
-      event_data:
-        entity_id: zwave.livingroom_button_controller
-        scene_id: 2 # people
-        scene_data: 0 # tap
-    action:
-      - service: automation.trigger
-        entity_id: automation.start_mopidy
-      - service: media_player.play_media
-        entity_id: media_player.mopidy
-        data:
-          media_content_id: "https://wpr-ice.streamguys1.com/wpr-ideas-mp3-64"
-          media_content_type: channel
-
-  - alias: "Audio play Kristen Spotify"
-    trigger:
-      platform: event
-      event_type: zwave.scene_activated
-      event_data:
-        entity_id: zwave.livingroom_button_controller
-        scene_id: 4 # circle with line
-        scene_data: 0 # tap
-    action:
-      - service: media_player.turn_on
-        entity_id: media_player.home_audio
-      - service: automation.trigger
-        entity_id: automation.start_kristen_spotify
-
-  - alias: "Audio play Jordan Spotify"
-    trigger:
-      platform: event
-      event_type: zwave.scene_activated
-      event_data:
-        entity_id: zwave.livingroom_button_controller
-        scene_id: 1 # moon and star
-        scene_data: 0 # tap
-    action:
-      - service: media_player.turn_on
-        entity_id: media_player.home_audio
-      - service: automation.trigger
-        entity_id: automation.start_jordan_spotify
+#  - alias: "Audio play WPR"
+#    trigger:
+#      - platform: event
+#        event_type: ozw.scene_activated
+#        event_data:
+#          entity_id: ozw.livingroom_button_controller
+#          scene_id: 2 # people
+#          scene_data: 0 # tap
+#    action:
+#      - service: media_player.turn_on
+#        entity_id: media_player.home
+#      - service: media_player.select_source
+#        data:
+#          entity_id: media_player.home
+#          source: mpd
+#      - service: media_player.play_media
+#        entity_id: media_player.home
+#        data:
+#          media_content_id: "https://wpr-ice.streamguys1.com/wpr-ideas-mp3-64"
+#          media_content_type: channel
+#
+#  - alias: "Audio play Kristen Spotify"
+#    trigger:
+#      platform: event
+#      event_type: ozw.scene_activated
+#      event_data:
+#        entity_id: ozw.livingroom_button_controller
+#        scene_id: 4 # circle with line
+#        scene_data: 0 # tap
+#    action:
+#      - service: media_player.turn_on
+#        entity_id: media_player.home
+#      - service: media_player.select_source
+#        data:
+#          entity_id: media_player.home
+#          source: Kristen Spotify
+#
+#  - alias: "Audio play Spotify Jordan"
+#    trigger:
+#      platform: event
+#      event_type: ozw.scene_activated
+#      event_data:
+#        entity_id: ozw.livingroom_button_controller
+#        scene_id: 1 # moon and star
+#        scene_data: 0 # tap
+#    action:
+#      - service: media_player.turn_on
+#        entity_id: media_player.home
+#      - service: media_player.select_source
+#        data:
+#          entity_id: media_player.home
+#          source: Spotify Jordan

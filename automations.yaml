@@ -1,104 +1,106 @@
-- alias: "Vacation - turn on lights at sunset"
+- alias: Vacation - turn on lights at sunset
   initial_state: true
   trigger:
-    - platform: sun
-      event: sunset
+  - platform: sun
+    event: sunset
   condition:
-    - condition: state
-      entity_id: input_boolean.vacation
-      state: "on"
+  - condition: state
+    entity_id: input_boolean.vacation
+    state: 'on'
   action:
-    - service: script.turn_on
-      entity_id: script.livingroom_normal
-
-- alias: "Vacation - bedroom lights on"
+  - service: script.turn_on
+    entity_id: script.livingroom_normal
+  id: 09605e8de26c4f15981dc9a2f18eb911
+- alias: Vacation - bedroom lights on
   initial_state: true
   trigger:
-    - platform: time
-      at: '21:00:00'
+  - platform: time
+    at: '21:00:00'
   condition:
-    - condition: state
-      entity_id: input_boolean.vacation
-      state: "on"
+  - condition: state
+    entity_id: input_boolean.vacation
+    state: 'on'
   action:
-    - service: script.turn_on
-      entity_id: script.bedroom_normal
-
-- alias: "Vacation - go to bed"
+  - service: script.turn_on
+    entity_id: script.bedroom_normal
+  id: 42c526154916467cb504b76f32b3d98d
+- alias: Vacation - go to bed
   initial_state: true
   trigger:
-    - platform: time
-      at: '00:00:00'
+  - platform: time
+    at: 00:00:00
   condition:
-    - condition: state
-      entity_id: input_boolean.vacation
-      state: "on"
+  - condition: state
+    entity_id: input_boolean.vacation
+    state: 'on'
   action:
-    - service: scene.turn_on
-      entity_id: scene.bedroom_dim
-    - service: light.turn_off
-      entity_id: light.livingroom
-
+  - service: scene.turn_on
+    entity_id: scene.bedroom_dim
+  - service: light.turn_off
+    entity_id: light.livingroom
+  id: 75710f9b4ca14810a204aacac85ef917
 - alias: Update Available Notification
   trigger:
-    - platform: state
-      entity_id: binary_sensor.updater
-      from: 'off'
-      to: 'on'
+  - platform: state
+    entity_id: binary_sensor.updater
+    from: 'off'
+    to: 'on'
   action:
-    - service: notify.notify
-      data_template:
-        message: "Home Assistant {{ state_attr('binary_sensor.updater', 'newest_version') }} is available."
-
+  - service: notify.notify
+    data_template:
+      message: Home Assistant {{ state_attr('binary_sensor.updater', 'newest_version')
+        }} is available.
+  id: e30a51aa1e2240f7be81b28514d1369d
 - alias: Garage Door Open Set Switch Color
   trigger:
-    - platform: state
-      entity_id: binary_sensor.garage_tilt_sensor
-      to: 'on'
+  - platform: state
+    entity_id: binary_sensor.garage_tilt_sensor
+    to: 'on'
   action:
-    - service: script.zwave_inovelli_led_color
-      data:
-        nodeid: 23
-        color: 'red'
-        duration: 'on'
-        effect: pulse
-        level: 100
-
+  - service: script.zwave_inovelli_led_color
+    data:
+      nodeid: 23
+      color: red
+      duration: 'on'
+      effect: pulse
+      level: 100
+  id: 43d5c2acebdf4ac4a3f9bcf97d37aeb8
 - alias: Garage Door Close Set Switch Color
   trigger:
-    - platform: state
-      entity_id: binary_sensor.garage_tilt_sensor
-      to: 'off'
+  - platform: state
+    entity_id: binary_sensor.garage_tilt_sensor
+    to: 'off'
   action:
-    - service: script.zwave_inovelli_led_color
-      data:
-        nodeid: 23
-        duration: 'off'
-        effect: 'off'
-
-- alias: "Media start"
+  - service: script.zwave_inovelli_led_color
+    data:
+      nodeid: 23
+      duration: 'off'
+      effect: 'off'
+  id: d6be07ceb58846378d06f62bc7eca64b
+- alias: Media start
   initial_state: true
   trigger:
     - platform: event
-      event_type: zwave.scene_activated
+      event_type: ozw.scene_activated
       event_data:
-        entity_id: zwave.switch_basement
+        node_id: 2
         scene_id: 1 # down
-        scene_data: 3 # double-tap
+        scene_value_label: "Pressed 2 Times"
   action:
-    - service: script.media_start
-
-- alias: "Media pause"
+  - service: script.media_start
+  id: 27581524d1b34a83a9bd3991c631ece7
+- alias: Media pause
   initial_state: true
   trigger:
-    - platform: state
-      entity_id: media_player.room1_main
-      from: 'on'
-      to: 'off'
+  - platform: state
+    entity_id: media_player.basement_receiver_main
+    from: 'on'
+    to: 'off'
   condition:
     condition: state
     entity_id: light.basement
     state: 'on'
   action:
-    - service: script.turn_on
-      entity_id: script.media_pause
+  - service: script.turn_on
+    entity_id: script.media_pause
+  id: 72424910e5ac43e4af4d2e7779a562da

@@ -1,7 +1,0 @@
-appdaemon:
-  threads: 10
-  plugins:
-    HASS:
-      type: hass
-      ha_url: http://127.0.0.1:8123
-      token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1NDM4ODk0NzcsImlzcyI6ImYwNDI0MGU3ZjMyMzQ2NGY5MmMxZmM0YTZiYzM4ODFlIiwiZXhwIjoxODU5MjQ5NDc3fQ.B-o0wgeWleJmvZf1hpzGOuhHAq5ic2qWP4kB-1oc5dg
