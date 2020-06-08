@@ -47,6 +47,37 @@ recorder:
 history:
 
 sensor:
+  - platform: mqtt
+    state_topic: emon/home/V1
+    name: Home Power Voltage 1
+    unit_of_measurement: "V"
+  - platform: mqtt
+    state_topic: emon/home/V2
+    name: Home Power Voltage 2
+    unit_of_measurement: "V"
+  - platform: mqtt
+    state_topic: emon/home/W
+    name: Home Power Watts
+    device_class: power
+    unit_of_measurement: "W"
+  - platform: mqtt
+    state_topic: emon/home/PF
+    name: Home Power Factor
+  - platform: mqtt
+    state_topic: emon/home/freq
+    unit_of_measurement: "hz"
+    name: Home Power Frequency
+  - platform: mqtt
+    state_topic: emon/home/temp
+    name: Home Power Temperature
+    device_class: temperature
+    unit_of_measurement: "°C"
+  - platform: mqtt
+    state_topic: emon/home/rssi
+    name: Home Power RSSI
+    device_class: signal_strength
+    unit_of_measurement: "dBm"
+
   - platform: template
     sensors:
       basement_smoke_alarm_status:
@@ -87,7 +118,7 @@ config:
 logger:
   default: info
   logs:
-    custom_components.ozw: debug
+    homeassistant.components.ozw: debug
 sun:
 
 roku:
