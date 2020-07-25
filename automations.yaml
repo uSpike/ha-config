@@ -104,38 +104,6 @@
   - service: script.turn_on
     entity_id: script.media_pause
   id: 72424910e5ac43e4af4d2e7779a562da
-- alias: Bathroom fan 10 minutes
-  initial_state: true
-  trigger:
-  - platform: event
-    event_type: ozw.scene_activated
-    event_data:
-      node_id: 29
-      scene_id: 2
-      scene_value_label: Pressed 2 Times
-  action:
-  - service: switch.turn_on
-    entity_id: switch.upstairs_bathroom_fan_switch
-  - delay: 00:10:00
-  - service: switch.turn_off
-    entity_id: switch.upstairs_bathroom_fan_switch
-  id: 718ff1064dbb462ca75d1df463389fe7
-- alias: Bathroom fan 20 minutes
-  initial_state: true
-  trigger:
-  - platform: event
-    event_type: ozw.scene_activated
-    event_data:
-      node_id: 29
-      scene_id: 2
-      scene_value_label: Pressed 3 Times
-  action:
-  - service: switch.turn_on
-    entity_id: switch.upstairs_bathroom_fan_switch
-  - delay: 00:20:00
-  - service: switch.turn_off
-    entity_id: switch.upstairs_bathroom_fan_switch
-  id: 68efc2ae12fe4513837f4abc39772660
 - id: '1592672504537'
   alias: Notify T-1000 bin full
   description: ''
