@@ -477,3 +477,27 @@ automation:
     action:
       - service: light.turn_off
         entity_id: light.front_door_dimmer_switch_level
+
+  - alias: "Bathroom light dim start"
+    initial_state: true
+    trigger:
+      - platform: time
+        at: "00:00:00"
+    action:
+      - service: ozw.set_config_parameter
+        data:
+          node_id: 30  # bathroom
+          parameter: 18  # "Custom Brightness Level On"
+          value: 15  # percentage
+
+  - alias: "Bathroom light dim end"
+    initial_state: true
+    trigger:
+      - platform: time
+        at: "00:06:00"
+    action:
+      - service: ozw.set_config_parameter
+        data:
+          node_id: 30  # bathroom
+          parameter: 18  # "Custom Brightness Level On"
+          value: 99  # percentage
