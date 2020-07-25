@@ -80,12 +80,12 @@
 - alias: Media start
   initial_state: true
   trigger:
-    - platform: event
-      event_type: ozw.scene_activated
-      event_data:
-        node_id: 2
-        scene_id: 1 # down
-        scene_value_label: "Pressed 2 Times"
+  - platform: event
+    event_type: ozw.scene_activated
+    event_data:
+      node_id: 2
+      scene_id: 1
+      scene_value_label: Pressed 2 Times
   action:
   - service: script.media_start
   id: 27581524d1b34a83a9bd3991c631ece7
@@ -107,30 +107,77 @@
 - alias: Bathroom fan 10 minutes
   initial_state: true
   trigger:
-    - platform: event
-      event_type: ozw.scene_activated
-      event_data:
-        node_id: 29
-        scene_id: 2 # up
-        scene_value_label: "Pressed 2 Times"
+  - platform: event
+    event_type: ozw.scene_activated
+    event_data:
+      node_id: 29
+      scene_id: 2
+      scene_value_label: Pressed 2 Times
   action:
   - service: switch.turn_on
     entity_id: switch.upstairs_bathroom_fan_switch
-  - delay: '00:10:00'
+  - delay: 00:10:00
   - service: switch.turn_off
     entity_id: switch.upstairs_bathroom_fan_switch
+  id: 718ff1064dbb462ca75d1df463389fe7
 - alias: Bathroom fan 20 minutes
   initial_state: true
   trigger:
-    - platform: event
-      event_type: ozw.scene_activated
-      event_data:
-        node_id: 29
-        scene_id: 2 # up
-        scene_value_label: "Pressed 3 Times"
+  - platform: event
+    event_type: ozw.scene_activated
+    event_data:
+      node_id: 29
+      scene_id: 2
+      scene_value_label: Pressed 3 Times
   action:
   - service: switch.turn_on
     entity_id: switch.upstairs_bathroom_fan_switch
-  - delay: '00:20:00'
+  - delay: 00:20:00
   - service: switch.turn_off
     entity_id: switch.upstairs_bathroom_fan_switch
+  id: 68efc2ae12fe4513837f4abc39772660
+- id: '1592672504537'
+  alias: Notify T-1000 bin full
+  description: ''
+  trigger:
+  - device_id: 2a15b8b3c35c44009c84069f867f8583
+    domain: binary_sensor
+    entity_id: binary_sensor.t_1000_bin_full
+    platform: device
+    type: turned_on
+  condition: []
+  action:
+  - data:
+      message: Please empty T-1000 bin
+      title: T-1000 Roomba bin is full
+    service: notify.notify
+- id: '1592672552040'
+  alias: New Automation
+  description: ''
+  trigger:
+  - device_id: 73fef5d5e8d945a695a863fbd51cdecc
+    domain: binary_sensor
+    entity_id: binary_sensor.hal_bin_full
+    platform: device
+    type: turned_on
+  condition: []
+  action:
+  - data:
+      message: Please empty Hal bin
+      title: Hal Roomba bin is full
+    service: notify.notify
+- id: '1592677647678'
+  alias: Clean on Sunday morning
+  description: ''
+  trigger:
+  - at: '9:00:00'
+    platform: time
+  condition:
+  - condition: time
+    weekday:
+    - sun
+  action:
+  - device_id: 2a15b8b3c35c44009c84069f867f8583
+    domain: vacuum
+    entity_id: vacuum.t_1000
+    type: clean
