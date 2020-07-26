@@ -10,6 +10,8 @@ homeassistant:
   auth_providers:
     - type: homeassistant
   packages: !include_dir_named packages
+  internal_url: !secret ha_base_url
+  external_url: !secret ha_base_url
 
 zone:
   - name: Home
@@ -46,37 +48,46 @@ recorder:
 
 history:
 
+utility_meter:
+  daily_energy:
+    source: sensor.home_power_watts
+    cycle: daily
+  monthly_energy:
+    source: sensor.home_power_watts
+    cycle: monthly
+
+
 sensor:
-  - platform: mqtt
-    state_topic: emon/home/V1
-    name: Home Power Voltage 1
-    unit_of_measurement: "V"
-  - platform: mqtt
-    state_topic: emon/home/V2
-    name: Home Power Voltage 2
-    unit_of_measurement: "V"
+#  - platform: mqtt
+#    state_topic: emon/home/V1
+#    name: Home Power Voltage 1
+#    unit_of_measurement: "V"
+#  - platform: mqtt
+#    state_topic: emon/home/V2
+#    name: Home Power Voltage 2
+#    unit_of_measurement: "V"
+#  - platform: mqtt
+#    state_topic: emon/home/PF
+#    name: Home Power Factor
+#  - platform: mqtt
+#    state_topic: emon/home/freq
+#    unit_of_measurement: "hz"
+#    name: Home Power Frequency
+#  - platform: mqtt
+#    state_topic: emon/home/temp
+#    name: Home Power Temperature
+#    device_class: temperature
+#    unit_of_measurement: "°C"
+#  - platform: mqtt
+#    state_topic: emon/home/rssi
+#    name: Home Power RSSI
+#    device_class: signal_strength
+#    unit_of_measurement: "dBm"
   - platform: mqtt
     state_topic: emon/home/W
     name: Home Power Watts
     device_class: power
     unit_of_measurement: "W"
-  - platform: mqtt
-    state_topic: emon/home/PF
-    name: Home Power Factor
-  - platform: mqtt
-    state_topic: emon/home/freq
-    unit_of_measurement: "hz"
-    name: Home Power Frequency
-  - platform: mqtt
-    state_topic: emon/home/temp
-    name: Home Power Temperature
-    device_class: temperature
-    unit_of_measurement: "°C"
-  - platform: mqtt
-    state_topic: emon/home/rssi
-    name: Home Power RSSI
-    device_class: signal_strength
-    unit_of_measurement: "dBm"
 
   - platform: template
     sensors:
@@ -117,8 +128,9 @@ map:
 config:
 logger:
   default: info
-  logs:
-    homeassistant.components.ozw: debug
+#  logs:
+#    homeassistant.components.ozw: debug
+
 sun:
 
 roku:
@@ -173,7 +185,6 @@ script:
         data_template:
           node_id: '{{ nodeid }}'
           parameter: 16
-          size: 4
           value: >
             {% if color is number and color >= 0 and color <= 255 %}
               {% set hx = color %}
