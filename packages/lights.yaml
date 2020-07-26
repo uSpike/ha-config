@@ -494,7 +494,7 @@ automation:
     initial_state: true
     trigger:
       - platform: time
-        at: "00:06:00"
+        at: "06:00:00"
     action:
       - service: ozw.set_config_parameter
         data:
