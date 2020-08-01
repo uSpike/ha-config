@@ -140,6 +140,9 @@ media_player:
 sensor:
   - platform: template
     sensors:
+      home_audio_source:
+        entity_id: media_player.home
+        value_template: '{{ state_attr("media_player.home", "source") }}'
       # Volume levels scaled back to 0.0 to 1.0
       kitchen_volume_level:
         entity_id: media_player.snapcast_client_kitchen
@@ -154,18 +157,6 @@ sensor:
           0.0
           {% endif %}
 
-
-binary_sensor:
-  - platform: template
-    sensors:
-      audio_source_jordan_spotify:
-        entity_id: media_player.home
-        value_template: '{{ state_attr("media_player.home", "source") == "Jordan_Spotify" }}'
-      audio_source_kristen_spotify:
-        entity_id: media_player.home
-        value_template: '{{ state_attr("media_player.home", "source") == "Kristen_Spotify" }}'
-
-
 script:
   turn_on_livingroom_audio:
     sequence:
@@ -174,56 +165,89 @@ script:
       - service: media_player.turn_on
         entity_id: media_player.livingroom_receiver_main
       - wait_template: '{{ is_state("media_player.livingroom_receiver_main", "on") }}'
-        timeout: '00:00:10'
+        timeout: '00:00:07'
       - service: media_player.select_source
-        data: {entity_id: media_player.livingroom_receiver_main, source: coaxial}
+        data: {entity_id: media_player.livingroom_receiver_main, source: "coaxial"}
 
   turn_off_livingroom_audio:
     sequence:
       - service: media_player.volume_mute
         data: {entity_id: media_player.snapcast_client_livingroom, is_volume_muted: True}
-      - service: media_player.select_source
-        data: {entity_id: media_player.livingroom_receiver_main, source: tuner}
-      - service: media_player.turn_off
-        entity_id: media_player.livingroom_receiver_main
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: media_player.livingroom_receiver_main
+                state: 'on'
+            sequence:
+              - service: media_player.select_source
+                data: {entity_id: media_player.livingroom_receiver_main, source: "tuner"}
+              - service: media_player.turn_off
+                entity_id: media_player.livingroom_receiver_main
 
 automation:
-  - alias: "Select Audio Source Jordan Spotify"
+  - alias: "Start Audio Jordan Spotify From Remote"
     trigger:
-      - platform: template
-        value_template: '{{ is_state_attr("media_player.home", "source", "Jordan_Spotify") }}'
+      - platform: event
+        event_type: ozw.scene_activated
+        event_data: {node_id: 24, scene_label: "Scene 2", scene_value_label: "Pressed 1 Time"}
     action:
-      - service: media_player.select_source
-        data: {entity_id: media_player.spotify_jordan, source: Snapcast}
-
-  - alias: "Select Audio Source Kristen Spotify"
-    trigger:
-      - platform: template
-        value_template: '{{ is_state_attr("media_player.home", "source", "Kristen_Spotify") }}'
-    action:
-      - service: media_player.select_source
-        data: {entity_id: media_player.spotify_kristen, source: Snapcast}
-
-  - alias: "Stop Audio Source Jordan Spotify"
-    trigger:
-      - platform: state
+      - service: media_player.turn_on
         entity_id: media_player.home
-        to: 'off'
-    condition:
-      - condition: template
-        value_template: '{{ is_state_attr("media_player.snapcast_group_home", "source", "Jordan_Spotify") }}'
-    action:
-      - service: media_player.media_pause
+      - service: media_player.select_source
+        data: {entity_id: media_player.home, source: Jordan_Spotify}
+      - service: media_player.media_play
         entity_id: media_player.spotify_jordan
 
-  - alias: "Stop Audio Source Kristen Spotify"
+  - alias: "Start Audio Kristen Spotify From Remote"
+    trigger:
+      - platform: event
+        event_type: ozw.scene_activated
+        event_data: {node_id: 24, scene_label: "Scene 1", scene_value_label: "Pressed 1 Time"}
+    action:
+      - service: media_player.turn_on
+        entity_id: media_player.home
+      - service: media_player.select_source
+        data: {entity_id: media_player.home, source: Kristen_Spotify}
+      - service: media_player.media_play
+        entity_id: media_player.spotify_kristen
+
+  - alias: "Stop Audio From Remote"
+    trigger:
+      - platform: event
+        event_type: ozw.scene_activated
+        event_data: {node_id: 24, scene_label: "Scene 3", scene_value_label: "Pressed 1 Time"}
+    action:
+      - service: media_player.turn_off
+        entity_id: media_player.home
+
+  - alias: "Audio Source Change"
     trigger:
       - platform: state
-        entity_id: media_player.home
-        to: 'off'
-    condition:
-      - condition: template
-        value_template: '{{ is_state_attr("media_player.snapcast_group_home", "source", "Kristen_Spotify") }}'
+        entity_id: sensor.home_audio_source
     action:
-      - service: media_player.media_pause
-        entity_id: media_player.spotify_kristen
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: '{{ trigger.to_state.state == "Jordan_Spotify" }}'
+            sequence:
+              - service: media_player.select_source
+                data: {entity_id: media_player.spotify_jordan, source: "Snapcast"}
+          - conditions:
+              - condition: template
+                value_template: '{{ trigger.to_state.state == "Kristen_Spotify" }}'
+            sequence:
+              - service: media_player.select_source
+                data: {entity_id: media_player.spotify_kristen, source: "Snapcast"}
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: '{{ trigger.from_state.state == "Jordan_Spotify" }}'
+            sequence:
+              - service: media_player.media_pause
+                entity_id: media_player.spotify_jordan
+          - conditions:
+              - condition: template
+                value_template: '{{ trigger.from_state.state == "Kristen_Spotify" }}'
+            sequence:
+              - service: media_player.media_pause
+                entity_id: media_player.spotify_kristen

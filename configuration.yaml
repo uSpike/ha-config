@@ -240,7 +240,7 @@ input_boolean:
   vacation:
     name: Vacation Mode
     initial: off
-    icon: mdi:hotel
+    icon: mdi:bed
 
 
 automation: !include automations.yaml
