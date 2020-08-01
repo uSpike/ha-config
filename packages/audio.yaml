@@ -8,6 +8,17 @@ spotify:
   client_id: !secret jordan_spotify_client_id
   client_secret: !secret jordan_spotify_client_secret
 
+spotcast:
+  sp_dc: !secret jordan_spotify_sp_dc
+  sp_key: !secret jordan_spotify_sp_key
+  accounts:
+    jordan:
+      sp_dc: !secret jordan_spotify_sp_dc
+      sp_key: !secret jordan_spotify_sp_key
+    kristen:
+      sp_dc: !secret kristen_spotify_sp_dc
+      sp_key: !secret kristen_spotify_sp_key
+
 media_player:
   - platform: yamaha_musiccast
     host: 10.52.110.12
