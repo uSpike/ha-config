@@ -31,12 +31,12 @@ media_player:
   - platform: snapcast
     host: !secret hass_ip
 
-#  - platform: mpd
-#    host: 192.168.1.12
-#    port: 6600
+  - platform: mpd
+    host: !secret hass_ip
+    port: 6600
 
   - platform: universal
-    name: Kitchen
+    name: "Kitchen"
     children:
       - media_player.snapcast_client_kitchen
     # State follows is_volume_muted
@@ -66,7 +66,7 @@ media_player:
       source_list: media_player.snapcast_client_kitchen|source_list
 
   - platform: universal
-    name: Livingroom
+    name: "Livingroom"
     children:
       - media_player.livingroom_receiver_main
       - media_player.snapcast_client_livingroom
@@ -176,7 +176,7 @@ script:
       - service: media_player.turn_on
         entity_id: media_player.livingroom_receiver_main
       - wait_template: '{{ is_state("media_player.livingroom_receiver_main", "on") }}'
-        timeout: '00:00:07'
+        timeout: "00:00:07"
       - service: media_player.select_source
         data: {entity_id: media_player.livingroom_receiver_main, source: "coaxial"}
 
@@ -188,39 +188,87 @@ script:
           - conditions:
               - condition: state
                 entity_id: media_player.livingroom_receiver_main
-                state: 'on'
+                state: "on"
             sequence:
               - service: media_player.select_source
                 data: {entity_id: media_player.livingroom_receiver_main, source: "tuner"}
               - service: media_player.turn_off
                 entity_id: media_player.livingroom_receiver_main
 
-automation:
-  - alias: "Start Audio Jordan Spotify From Remote"
-    trigger:
-      - platform: event
-        event_type: ozw.scene_activated
-        event_data: {node_id: 24, scene_label: "Scene 2", scene_value_label: "Pressed 1 Time"}
-    action:
-      - service: media_player.turn_on
-        entity_id: media_player.home
-      - service: media_player.select_source
-        data: {entity_id: media_player.home, source: Jordan_Spotify}
-      - service: media_player.media_play
-        entity_id: media_player.spotify_jordan
+  audio_source_radio_wpr:
+    sequence:
+      - service: media_player.play_media
+        entity_id: media_player.mpd
+        data:
+          media_content_id: "https://wpr-ice.streamguys1.com/wpr-ideas-mp3-64"
+          media_content_type: "channel"
 
-  - alias: "Start Audio Kristen Spotify From Remote"
+automation:
+  - alias: "Remote Jordan Spotify"
     trigger:
       - platform: event
         event_type: ozw.scene_activated
-        event_data: {node_id: 24, scene_label: "Scene 1", scene_value_label: "Pressed 1 Time"}
+        event_data: {node_id: 24, scene_label: "Scene 2"}
     action:
-      - service: media_player.turn_on
-        entity_id: media_player.home
-      - service: media_player.select_source
-        data: {entity_id: media_player.home, source: Kristen_Spotify}
-      - service: media_player.media_play
-        entity_id: media_player.spotify_kristen
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: '{{ trigger.event.data["scene_value_label"] == "Pressed 1 Time" }}'
+            sequence:
+              - service: media_player.turn_on
+                entity_id: media_player.home
+              - service: media_player.select_source
+                data: {entity_id: media_player.home, source: "Jordan_Spotify"}
+              - service: media_player.media_play
+                entity_id: media_player.spotify_jordan
+          - conditions:
+              - condition: template
+                value_template: '{{ trigger.event.data["scene_value_label"] == "Key Held Down" }}'
+            sequence:
+              - service: media_player.media_next_track
+                entity_id: media_player.spotify_jordan
+
+  - alias: "Remote Kristen Spotify"
+    trigger:
+      - platform: event
+        event_type: ozw.scene_activated
+        event_data: {node_id: 24, scene_label: "Scene 1"}
+    action:
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: '{{ trigger.event.data["scene_value_label"] == "Pressed 1 Time" }}'
+            sequence:
+              - service: media_player.turn_on
+                entity_id: media_player.home
+              - service: media_player.select_source
+                data: {entity_id: media_player.home, source: "Kristen_Spotify"}
+              - service: media_player.media_play
+                entity_id: media_player.spotify_kristen
+          - conditions:
+              - condition: template
+                value_template: '{{ trigger.event.data["scene_value_label"] == "Key Held Down" }}'
+            sequence:
+              - service: media_player.media_next_track
+                entity_id: media_player.spotify_jordan
+
+  - alias: "Remote WPR"
+    trigger:
+      - platform: event
+        event_type: ozw.scene_activated
+        event_data: {node_id: 24, scene_label: "Scene 4"}
+    action:
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: '{{ trigger.event.data["scene_value_label"] == "Pressed 1 Time" }}'
+            sequence:
+              - service: media_player.turn_on
+                entity_id: media_player.home
+              - service: media_player.select_source
+                data: {entity_id: media_player.home, source: "MPD"}
+              - service: script.turn_on
+                entity_id: script.audio_source_radio_wpr
 
   - alias: "Stop Audio From Remote"
     trigger:
@@ -262,3 +310,9 @@ automation:
             sequence:
               - service: media_player.media_pause
                 entity_id: media_player.spotify_kristen
+          - conditions:
+              - condition: template
+                value_template: '{{ trigger.from_state.state == "MPD" }}'
+            sequence:
+              - service: media_player.media_stop
+                entity_id: media_player.mpd
