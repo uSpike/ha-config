@@ -66,6 +66,36 @@ media_player:
       source_list: media_player.snapcast_client_kitchen|source_list
 
   - platform: universal
+    name: "Bedroom"
+    children:
+      - media_player.snapcast_client_bedroom
+    # State follows is_volume_muted
+    state_template: >
+      {% if state_attr('media_player.snapcast_client_bedroom', 'is_volume_muted') %}
+      off
+      {% else %}
+      on
+      {% endif %}
+    commands:
+      turn_on:
+        service: media_player.volume_mute
+        data: {entity_id: media_player.snapcast_client_bedroom, is_volume_muted: False}
+      turn_off:
+        service: media_player.volume_mute
+        data: {entity_id: media_player.snapcast_client_bedroom, is_volume_muted: True}
+      # Scale volume with minimum of 0% and max of 40%
+      volume_set:
+        service: media_player.volume_set
+        data_template:
+          entity_id: media_player.snapcast_client_bedroom
+          volume_level: '{{ 0 + ((0.40 - 0) * volume_level) }}'
+    attributes:
+      volume_level: sensor.bedroom_volume_level
+      is_volume_muted: media_player.snapcast_client_bedroom|is_volume_muted
+      source: media_player.snapcast_client_bedroom|source
+      source_list: media_player.snapcast_client_bedroom|source_list
+
+  - platform: universal
     name: "Livingroom"
     children:
       - media_player.livingroom_receiver_main
@@ -99,23 +129,27 @@ media_player:
     name: Home
     children:
       - media_player.kitchen
+      - media_player.bedroom
       - media_player.livingroom
     commands:
       turn_on:
         service: media_player.turn_on
         entity_id:
           - media_player.kitchen
+          - media_player.bedroom
           - media_player.livingroom
       turn_off:
         service: media_player.turn_off
         entity_id:
-          - media_player.livingroom
           - media_player.kitchen
+          - media_player.bedroom
+          - media_player.livingroom
       volume_set:
         service: media_player.volume_set
         data_template:
           entity_id:
             - media_player.kitchen
+            - media_player.bedroom
             - media_player.livingroom
           volume_level: '{{ volume_level }}'
       volume_mute:
@@ -123,17 +157,20 @@ media_player:
         data_template:
           entity_id:
             - media_player.kitchen
+            - media_player.bedroom
             - media_player.livingroom
           is_volume_muted: '{{ is_volume_muted }}'
       volume_up:
         service: media_player.volume_up
         entity_id:
           - media_player.kitchen
+          - media_player.bedroom
           - media_player.livingroom
       volume_down:
         service: media_player.volume_down
         entity_id:
           - media_player.kitchen
+          - media_player.bedroom
           - media_player.livingroom
       select_source:
         service: media_player.select_source
@@ -141,6 +178,7 @@ media_player:
           entity_id:
             - media_player.snapcast_group_home
             - media_player.snapcast_client_kitchen
+            - media_player.snapcast_client_bedroom
             - media_player.snapcast_client_livingroom
           source: '{{ source }}'
     attributes:
@@ -158,6 +196,9 @@ sensor:
       kitchen_volume_level:
         entity_id: media_player.snapcast_client_kitchen
         value_template: '{{ (state_attr("media_player.snapcast_client_kitchen", "volume_level") - 0.0) / (0.40 - 0.0) }}'
+      bedroom_volume_level:
+        entity_id: media_player.snapcast_client_bedroom
+        value_template: '{{ (state_attr("media_player.snapcast_client_bedroom", "volume_level") - 0.0) / (0.40 - 0.0) }}'
       livingroom_volume_level:
         entity_id: media_player.livingroom_receiver_main
         value_template: >-
