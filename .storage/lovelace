@@ -1,0 +1,293 @@
+{
+    "data": {
+        "config": {
+            "title": "Home",
+            "views": [
+                {
+                    "badges": null,
+                    "cards": [
+                        {
+                            "entity": "weather.home",
+                            "type": "weather-forecast"
+                        },
+                        {
+                            "entities": [
+                                {
+                                    "entity": "binary_sensor.bedroom_sliding_door_sensor_access_control_door_window_open"
+                                },
+                                {
+                                    "entity": "binary_sensor.garage_door_tilt_sensor_access_control_door_window_open"
+                                }
+                            ],
+                            "show_header_toggle": false,
+                            "title": "Doors",
+                            "type": "entities"
+                        },
+                        {
+                            "entities": [
+                                "input_boolean.vacation"
+                            ],
+                            "show_header_toggle": false,
+                            "title": "Settings",
+                            "type": "entities"
+                        },
+                        {
+                            "entities": [
+                                {
+                                    "entity": "light.basement"
+                                },
+                                {
+                                    "entity": "light.livingroom"
+                                },
+                                {
+                                    "entity": "light.bedroom"
+                                },
+                                {
+                                    "entity": "light.office"
+                                },
+                                {
+                                    "entity": "light.front_door_dimmer_switch_level"
+                                },
+                                {
+                                    "entity": "light.kitchen_dimmer_switch_level"
+                                },
+                                {
+                                    "entity": "light.deck_dimmer_plug_level"
+                                },
+                                {
+                                    "entity": "light.bathroom_dimmer_switch_level"
+                                }
+                            ],
+                            "show_header_toggle": false,
+                            "title": "Light",
+                            "type": "entities"
+                        },
+                        {
+                            "entities": [
+                                {
+                                    "entity": "sensor.basement_smoke_alarm_status"
+                                }
+                            ],
+                            "show_header_toggle": false,
+                            "title": "Alarms",
+                            "type": "entities"
+                        },
+                        {
+                            "entities": [
+                                {
+                                    "entity": "lock.front_door_lock_locked"
+                                },
+                                {
+                                    "entity": "lock.garage_door_lock_locked"
+                                }
+                            ],
+                            "title": "Locks",
+                            "type": "entities"
+                        },
+                        {
+                            "cards": [
+                                {
+                                    "entities": [
+                                        {
+                                            "entity": "sensor.home_power_watts"
+                                        }
+                                    ],
+                                    "hours_to_show": 8,
+                                    "refresh_interval": 30,
+                                    "title": "Power usage",
+                                    "type": "history-graph"
+                                }
+                            ],
+                            "type": "vertical-stack"
+                        },
+                        {
+                            "entities": [
+                                "binary_sensor.hal_bin_full",
+                                "vacuum.hal"
+                            ],
+                            "type": "entities"
+                        },
+                        {
+                            "entities": [
+                                "vacuum.t_1000",
+                                "binary_sensor.t_1000_bin_full"
+                            ],
+                            "type": "entities"
+                        }
+                    ],
+                    "path": "default_view",
+                    "title": "Home"
+                },
+                {
+                    "badges": [],
+                    "cards": [
+                        {
+                            "cards": [
+                                {
+                                    "entity": "media_player.home",
+                                    "group": true,
+                                    "hide": {
+                                        "controls": true,
+                                        "power_state": false,
+                                        "volume": true
+                                    },
+                                    "shortcuts": {
+                                        "attribute": "source",
+                                        "buttons": [
+                                            {
+                                                "icon": "mdi:spotify",
+                                                "id": "Kristen_Spotify",
+                                                "name": "Kristen",
+                                                "type": "source"
+                                            },
+                                            {
+                                                "icon": "mdi:spotify",
+                                                "id": "Jordan_Spotify",
+                                                "name": "Jordan",
+                                                "type": "source"
+                                            },
+                                            {
+                                                "icon": "mdi:radio",
+                                                "id": "MPD",
+                                                "name": "Radio",
+                                                "type": "source"
+                                            }
+                                        ],
+                                        "columns": 2,
+                                        "hide_when_off": true
+                                    },
+                                    "source": "icon",
+                                    "type": "custom:mini-media-player"
+                                },
+                                {
+                                    "entity": "media_player.bedroom",
+                                    "group": true,
+                                    "hide": {
+                                        "controls": true,
+                                        "source": true
+                                    },
+                                    "icon": "mdi:speaker",
+                                    "name": "Bedroom",
+                                    "type": "custom:mini-media-player"
+                                },
+                                {
+                                    "entity": "media_player.kitchen",
+                                    "group": true,
+                                    "hide": {
+                                        "controls": true,
+                                        "source": true
+                                    },
+                                    "icon": "mdi:speaker",
+                                    "name": "Kitchen",
+                                    "type": "custom:mini-media-player"
+                                },
+                                {
+                                    "entity": "media_player.livingroom",
+                                    "group": true,
+                                    "hide": {
+                                        "controls": true,
+                                        "source": true
+                                    },
+                                    "icon": "mdi:speaker",
+                                    "name": "Livingroom",
+                                    "type": "custom:mini-media-player"
+                                }
+                            ],
+                            "type": "vertical-stack"
+                        },
+                        {
+                            "cards": [
+                                {
+                                    "card": {
+                                        "cards": [
+                                            {
+                                                "entity": "media_player.spotify_jordan",
+                                                "type": "media-control"
+                                            },
+                                            {
+                                                "account": "jordan",
+                                                "spotify_entity": "media_player.spotify_jordan",
+                                                "type": "custom:spotify-card"
+                                            }
+                                        ],
+                                        "type": "vertical-stack"
+                                    },
+                                    "conditions": [
+                                        {
+                                            "entity": "sensor.home_audio_source",
+                                            "state": "Jordan_Spotify"
+                                        }
+                                    ],
+                                    "type": "conditional"
+                                },
+                                {
+                                    "card": {
+                                        "cards": [
+                                            {
+                                                "entity": "media_player.spotify_kristen",
+                                                "type": "media-control"
+                                            },
+                                            {
+                                                "account": "kristen",
+                                                "spotify_entity": "media_player.spotify_kristen",
+                                                "type": "custom:spotify-card"
+                                            }
+                                        ],
+                                        "type": "vertical-stack"
+                                    },
+                                    "conditions": [
+                                        {
+                                            "entity": "sensor.home_audio_source",
+                                            "state": "Kristen_Spotify"
+                                        }
+                                    ],
+                                    "type": "conditional"
+                                },
+                                {
+                                    "card": {
+                                        "cards": [
+                                            {
+                                                "entity": "media_player.mpd",
+                                                "type": "media-control"
+                                            },
+                                            {
+                                                "entity": "script.audio_source_radio_wpr",
+                                                "hold_action": {
+                                                    "action": "more-info"
+                                                },
+                                                "icon": "mdi:radio",
+                                                "icon_height": "32px",
+                                                "name": "WPR",
+                                                "show_icon": true,
+                                                "show_name": true,
+                                                "show_state": false,
+                                                "tap_action": {
+                                                    "action": "toggle"
+                                                },
+                                                "type": "button"
+                                            }
+                                        ],
+                                        "type": "vertical-stack"
+                                    },
+                                    "conditions": [
+                                        {
+                                            "entity": "sensor.home_audio_source",
+                                            "state": "MPD"
+                                        }
+                                    ],
+                                    "type": "conditional"
+                                }
+                            ],
+                            "type": "vertical-stack"
+                        }
+                    ],
+                    "panel": false,
+                    "path": "audio",
+                    "title": "Audio"
+                }
+            ]
+        }
+    },
+    "key": "lovelace",
+    "version": 1
+}
