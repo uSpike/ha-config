@@ -13,18 +13,6 @@ homeassistant:
   internal_url: !secret ha_base_url
   external_url: !secret ha_base_url
 
-zone:
-  - name: Home
-    latitude: !secret home_latitude
-    longitude: !secret home_longitude
-    icon: mdi:home
-
-  - name: XES
-    latitude: !secret xes_latitude
-    longitude: !secret xes_longitude
-    radius: 250
-    icon: mdi:briefcase
-
 system_health:
 updater:
   reporting: false
@@ -35,7 +23,8 @@ hacs:
 
 recorder:
   db_url: !secret db_url
-  purge_keep_days: 30
+  auto_purge: true
+  purge_keep_days: 10
   include:
     domains:
       - sensor
@@ -43,18 +32,16 @@ recorder:
       - switch
       - light
       - media_player
-      - device_tracker
-      - person
 
 history:
 
-utility_meter:
-  daily_energy:
-    source: sensor.home_power_watts
-    cycle: daily
-  monthly_energy:
-    source: sensor.home_power_watts
-    cycle: monthly
+#utility_meter:
+#  daily_energy:
+#    source: sensor.home_power_watts
+#    cycle: daily
+#  monthly_energy:
+#    source: sensor.home_power_watts
+#    cycle: monthly
 
 
 sensor:
@@ -133,8 +120,8 @@ logger:
 
 sun:
 
-roku:
-  - host: 10.52.110.13
+#roku:
+#  - host: 10.52.110.13
 
 wake_on_lan:
 panasonic_viera:

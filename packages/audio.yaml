@@ -8,17 +8,6 @@ spotify:
   client_id: !secret jordan_spotify_client_id
   client_secret: !secret jordan_spotify_client_secret
 
-spotcast:
-  sp_dc: !secret jordan_spotify_sp_dc
-  sp_key: !secret jordan_spotify_sp_key
-  accounts:
-    jordan:
-      sp_dc: !secret jordan_spotify_sp_dc
-      sp_key: !secret jordan_spotify_sp_key
-    kristen:
-      sp_dc: !secret kristen_spotify_sp_dc
-      sp_key: !secret kristen_spotify_sp_key
-
 media_player:
   - platform: yamaha_musiccast
     host: 10.52.110.12
@@ -190,17 +179,13 @@ sensor:
   - platform: template
     sensors:
       home_audio_source:
-        entity_id: media_player.home
         value_template: '{{ state_attr("media_player.home", "source") }}'
       # Volume levels scaled back to 0.0 to 1.0
       kitchen_volume_level:
-        entity_id: media_player.snapcast_client_kitchen
         value_template: '{{ (state_attr("media_player.snapcast_client_kitchen", "volume_level") - 0.0) / (0.40 - 0.0) }}'
       bedroom_volume_level:
-        entity_id: media_player.snapcast_client_bedroom
         value_template: '{{ (state_attr("media_player.snapcast_client_bedroom", "volume_level") - 0.0) / (0.40 - 0.0) }}'
       livingroom_volume_level:
-        entity_id: media_player.livingroom_receiver_main
         value_template: >-
           {% set vol = state_attr("media_player.livingroom_receiver_main", "volume_level") %}
           {% if vol != None %}
@@ -248,13 +233,13 @@ automation:
   - alias: "Remote Jordan Spotify"
     trigger:
       - platform: event
-        event_type: ozw.scene_activated
-        event_data: {node_id: 24, scene_label: "Scene 2"}
+        event_type: zwave_js_value_notification
+        event_data: {node_id: 24, label: "Scene 002"}
     action:
       - choose:
           - conditions:
               - condition: template
-                value_template: '{{ trigger.event.data["scene_value_label"] == "Pressed 1 Time" }}'
+                value_template: '{{ trigger.event.data["value"] == "KeyPressed" }}'
             sequence:
               - service: media_player.turn_on
                 entity_id: media_player.home
@@ -264,7 +249,7 @@ automation:
                 entity_id: media_player.spotify_jordan
           - conditions:
               - condition: template
-                value_template: '{{ trigger.event.data["scene_value_label"] == "Key Held Down" }}'
+                value_template: '{{ trigger.event.data["value"] == "KeyHeldDown" }}'
             sequence:
               - service: media_player.media_next_track
                 entity_id: media_player.spotify_jordan
@@ -272,13 +257,13 @@ automation:
   - alias: "Remote Kristen Spotify"
     trigger:
       - platform: event
-        event_type: ozw.scene_activated
-        event_data: {node_id: 24, scene_label: "Scene 1"}
+        event_type: zwave_js_value_notification
+        event_data: {node_id: 24, scene_label: "Scene 001"}
     action:
       - choose:
           - conditions:
               - condition: template
-                value_template: '{{ trigger.event.data["scene_value_label"] == "Pressed 1 Time" }}'
+                value_template: '{{ trigger.event.data["value"] == "KeyPressed" }}'
             sequence:
               - service: media_player.turn_on
                 entity_id: media_player.home
@@ -288,7 +273,7 @@ automation:
                 entity_id: media_player.spotify_kristen
           - conditions:
               - condition: template
-                value_template: '{{ trigger.event.data["scene_value_label"] == "Key Held Down" }}'
+                value_template: '{{ trigger.event.data["value"] == "KeyHeldDown" }}'
             sequence:
               - service: media_player.media_next_track
                 entity_id: media_player.spotify_jordan
@@ -296,13 +281,13 @@ automation:
   - alias: "Remote WPR"
     trigger:
       - platform: event
-        event_type: ozw.scene_activated
-        event_data: {node_id: 24, scene_label: "Scene 4"}
+        event_type: zwave_js_value_notification
+        event_data: {node_id: 24, scene_label: "Scene 004"}
     action:
       - choose:
           - conditions:
               - condition: template
-                value_template: '{{ trigger.event.data["scene_value_label"] == "Pressed 1 Time" }}'
+                value_template: '{{ trigger.event.data["value"] == "KeyPressed" }}'
             sequence:
               - service: media_player.turn_on
                 entity_id: media_player.home
@@ -314,8 +299,8 @@ automation:
   - alias: "Stop Audio From Remote"
     trigger:
       - platform: event
-        event_type: ozw.scene_activated
-        event_data: {node_id: 24, scene_label: "Scene 3", scene_value_label: "Pressed 1 Time"}
+        event_type: zwave_js_value_notification
+        event_data: {node_id: 24, scene_label: "Scene 003", value: "KeyPressed"}
     action:
       - service: media_player.turn_off
         entity_id: media_player.home

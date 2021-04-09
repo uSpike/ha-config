@@ -149,3 +149,35 @@
     domain: vacuum
     entity_id: vacuum.t_1000
     type: clean
+- id: '1613949731757'
+  alias: Office lights on
+  description: ''
+  trigger:
+  - platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      node_id: 7
+      label: Scene 002
+      value: KeyPressed
+  condition: []
+  action:
+  - service: light.turn_on
+    data: {}
+    entity_id: light.office
+  mode: single
+- id: '1613949846667'
+  alias: Office lights off
+  description: ''
+  trigger:
+  - platform: event
+    event_type: ozw.scene_activated
+    event_data:
+      node_id: 7
+      scene_id: 1
+      scene_value_label: Pressed 1 Time
+  condition: []
+  action:
+  - service: light.turn_off
+    data: {}
+    entity_id: light.office
+  mode: single

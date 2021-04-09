@@ -58,6 +58,25 @@ light:
     name: Livingroom Switch
     entity_id: switch.living_room_switch_switch
 
+  - platform: switch
+    name: Office Lamp
+    entity_id: switch.office_plug_instance_1_switch
+
+  - platform: switch
+    name: Office Uplight 1
+    entity_id: switch.office_overhead_plug
+
+  - platform: switch
+    name: Office Uplight 2
+    entity_id: switch.office_overhead_plug_2
+
+  - platform: group
+    name: Office
+    entities:
+      - light.office_lamp
+      - light.office_uplight_1
+      - light.office_uplight_2
+
   - platform: group
     name: Livingroom Fixture
     entities:
@@ -81,12 +100,8 @@ light:
   - platform: group
     name: Basement
     entities:
-      - light.basement_dimmer_switch_level
-      - light.basement_lamp_dimmer_plug_level
-
-  - platform: switch
-    name: Office
-    entity_id: switch.office_plug_instance_1_switch
+      - light.basement_dimmer_switch
+      - light.basement_lamp_dimmer_plug
 
   - platform: group
     name: All Lights
@@ -147,11 +162,11 @@ automation:
     initial_state: true
     trigger:
       platform: event
-      event_type: ozw.scene_activated
+      event_type: zwave_js_value_notification
       event_data:
         node_id: 3
-        scene_id: 2 # up
-        scene_value_label: "Pressed 1 Time"
+        label: "Scene 002" # up
+        value: "KeyPressed"
     action:
       - service: switch.turn_on
         entity_id: switch.livingroom_flux
@@ -165,11 +180,11 @@ automation:
     initial_state: true
     trigger:
       platform: event
-      event_type: ozw.scene_activated
+      event_type: zwave_js_value_notification
       event_data:
         node_id: 3
-        scene_id: 1 # down
-        scene_value_label: "Pressed 1 Time"
+        label: "Scene 001" # down
+        value: "KeyPressed"
     action:
       service: light.turn_off
       entity_id: light.livingroom
@@ -178,11 +193,11 @@ automation:
     initial_state: true
     trigger:
       platform: event
-      event_type: ozw.scene_activated
+      event_type: zwave_js_value_notification
       event_data:
         node_id: 3
-        scene_id: 2 # up
-        scene_value_label: "Pressed 2 Times"
+        label: "Scene 002" # up
+        value: "KeyPressed2x"
     action:
       - service: switch.turn_off
         entity_id: switch.livingroom_flux
@@ -196,11 +211,11 @@ automation:
     initial_state: true
     trigger:
       platform: event
-      event_type: ozw.scene_activated
+      event_type: zwave_js_value_notification
       event_data:
         node_id: 3
-        scene_id: 1 # down
-        scene_value_label: "Pressed 2 Times"
+        label: "Scene 001" # down
+        value: "KeyPressed2x"
     action:
       - service: switch.turn_off
         entity_id: switch.livingroom_flux
@@ -215,18 +230,18 @@ automation:
     trigger:
       # Bedroom button 0
       - platform: event
-        event_type: ozw.scene_activated
+        event_type: zwave_js_value_notification
         event_data:
           node_id: 14
-          scene_id: 3 # center
-          scene_value_label: "Key Held down"
+          label: "Scene 003" # center
+          value: "KeyHeldDown"
       # Bedroom button 1
       - platform: event
-        event_type: ozw.scene_activated
+        event_type: zwave_js_value_notification
         event_data:
           node_id: 15
-          scene_id: 3 # center
-          scene_value_label: "Key Held down"
+          label: "Scene 003" # center
+          value: "KeyHeldDown"
     action:
       - service: light.turn_on
         entity_id: light.all_lights
@@ -236,18 +251,18 @@ automation:
     trigger:
       # Bedroom button 0
       - platform: event
-        event_type: ozw.scene_activated
+        event_type: zwave_js_value_notification
         event_data:
           node_id: 14
-          scene_id: 1 # moon
-          scene_value_label: "Pressed 1 Time"
+          label: "Scene 001" # moon
+          value: "KeyPressed"
       # Bedroom button 1
       - platform: event
-        event_type: ozw.scene_activated
+        event_type: zwave_js_value_notification
         event_data:
           node_id: 15
-          scene_id: 1 # moon
-          scene_value_label: "Pressed 1 Time"
+          label: "Scene 001" # moon
+          value: "KeyPressed"
     action:
       - service: light.turn_off
         entity_id: light.all_lights
@@ -257,50 +272,37 @@ automation:
     trigger:
       # Bedroom button 0
       - platform: event
-        event_type: ozw.scene_activated
+        event_type: zwave_js_value_notification
         event_data:
           node_id: 14
-          scene_id: 3 # center
-          scene_value_label: "Pressed 1 Time"
+          label: "Scene 003" # center
+          value: "KeyPressed"
       # Bedroom button 1
       - platform: event
-        event_type: ozw.scene_activated
+        event_type: zwave_js_value_notification
         event_data:
           node_id: 15
-          scene_id: 3 # center
-          scene_value_label: "Pressed 1 Time"
+          label: "Scene 003" # center
+          value: "KeyPressed"
     action:
-      - choose:
-          - conditions:
-              - condition: state
-                entity_id: light.bedroom
-                state: "on"
-            sequence:
-              - service: light.turn_off
-                entity_id: light.bedroom
-          - conditions:
-              - condition: state
-                entity_id: light.bedroom
-                state: "off"
-            sequence:
-              - service: light.turn_on
-                data:
-                  entity_id: light.bedroom
-                  brightness_pct: 70
-                  transition: 0.5
-              - service: switch.turn_on
-                entity_id: switch.bedroom_flux
+      - service: light.toggle
+        data:
+          entity_id: light.bedroom
+          brightness_pct: 70
+          transition: 0.5
+      - service: switch.turn_on
+        entity_id: switch.bedroom_flux
 
   - alias: "Bedroom lights on"
     initial_state: true
     trigger:
       # Wall switch
       - platform: event
-        event_type: ozw.scene_activated
+        event_type: zwave_js_value_notification
         event_data:
           node_id: 6
-          scene_id: 2 # up
-          scene_value_label: "Pressed 1 Time"
+          label: "Scene 002" # up
+          value: "KeyPressed"
     action:
       - service: light.turn_on
         data:
@@ -313,26 +315,27 @@ automation:
   - alias: "Bedroom lights bright"
     initial_state: true
     trigger:
+      # Wall switch
       - platform: event
-        event_type: ozw.scene_activated
+        event_type: zwave_js_value_notification
         event_data:
           node_id: 6
-          scene_id: 2 # up
-          scene_value_label: "Pressed 2 Times"
+          label: "Scene 002" # up
+          value: "KeyPressed2x"
       # Bedroom button 0
       - platform: event
-        event_type: ozw.scene_activated
+        event_type: zwave_js_value_notification
         event_data:
           node_id: 14
-          scene_id: 2 # people
-          scene_value_label: "Pressed 1 Time"
+          label: "Scene 002" # people
+          value: "KeyPressed"
       # Bedroom button 1
       - platform: event
-        event_type: ozw.scene_activated
+        event_type: zwave_js_value_notification
         event_data:
           node_id: 15
-          scene_id: 2 # people
-          scene_value_label: "Pressed 1 Time"
+          label: "Scene 002" # people
+          value: "KeyPressed"
     action:
       - service: switch.turn_off
         entity_id: switch.bedroom_flux
@@ -347,25 +350,25 @@ automation:
     initial_state: true
     trigger:
       - platform: event
-        event_type: ozw.scene_activated
+        event_type: zwave_js_value_notification
         event_data:
           node_id: 6
-          scene_id: 1 # down
-          scene_value_label: "Pressed 2 Times"
+          label: "Scene 001" # down
+          value: "KeyPressed2x"
       # Bedroom button 0
       - platform: event
-        event_type: ozw.scene_activated
+        event_type: zwave_js_value_notification
         event_data:
           node_id: 14
-          scene_id: 4 # circle-line
-          scene_value_label: "Pressed 1 Time"
+          label: "Scene 004" # circle-line
+          value: "KeyPressed"
       # Bedroom button 1
       - platform: event
-        event_type: ozw.scene_activated
+        event_type: zwave_js_value_notification
         event_data:
           node_id: 15
-          scene_id: 4 # circle-line
-          scene_value_label: "Pressed 1 Time"
+          label: "Scene 004" # circle-line
+          value: "KeyPressed"
     action:
       - service: light.turn_on
         data:
@@ -380,51 +383,51 @@ automation:
     initial_state: true
     trigger:
       - platform: event
-        event_type: ozw.scene_activated
+        event_type: zwave_js_value_notification
         event_data:
           node_id: 6
-          scene_id: 1 # down
-          scene_value_label: "Pressed 1 Time"
+          label: "Scene 001" # down
+          value: "KeyPressed"
     action:
       service: light.turn_off
       entity_id: light.bedroom
 
-  - alias: "Office lights on"
-    initial_state: true
-    trigger:
-      platform: event
-      event_type: ozw.scene_activated
-      event_data:
-        node_id: 7
-        scene_id: 2 # up
-        scene_value_label: "Pressed 1 Time"
-    action:
-      service: light.turn_on
-      entity_id: light.office
-
-  - alias: "Office lights off"
-    initial_state: true
-    trigger:
-      platform: event
-      event_type: ozw.scene_activated
-      event_data:
-        node_id: 7
-        scene_id: 1 # down
-        scene_value_id: 0 # tap
-        scene_value_label: "Pressed 1 Time"
-    action:
-      service: light.turn_off
-      entity_id: light.office
+#  - alias: "Office lights on"
+#    initial_state: true
+#    trigger:
+#      platform: event
+#      event_type: zwave_js_value_notification
+#      event_data:
+#        node_id: 7
+#        label: "Scene 002" # up
+#        value: "KeyPressed"
+#    action:
+#      service: light.turn_on
+#      entity_id: light.office
+#
+#  - alias: "Office lights off"
+#    initial_state: true
+#    trigger:
+#      platform: event
+#      event_type: zwave_js_value_notification
+#      event_data:
+#        node_id: 7
+#        label: "Scene 001 # down
+#        scene_value_id: 0 # tap
+#        value: "KeyPressed"
+#    action:
+#      service: light.turn_off
+#      entity_id: light.office
 
   - alias: "Basement lights off"
     initial_state: true
     trigger:
       platform: event
-      event_type: ozw.scene_activated
+      event_type: zwave_js_value_notification
       event_data:
         node_id: 2
-        scene_id: 1 # down
-        scene_value_label: "Pressed 1 Time"
+        label: "Scene 001" # down
+        value: "KeyPressed"
     action:
       service: light.turn_off
       entity_id: light.basement
@@ -433,11 +436,11 @@ automation:
     initial_state: true
     trigger:
       platform: event
-      event_type: ozw.scene_activated
+      event_type: zwave_js_value_notification
       event_data:
         node_id: 2
-        scene_id: 2 # up
-        scene_value_label: "Pressed 1 Time"
+        label: "Scene 002" # up
+        value: "KeyPressed"
     action:
       - service: light.turn_on
         entity_id: light.basement
@@ -448,17 +451,17 @@ automation:
     initial_state: true
     trigger:
       - platform: state
-        entity_id: light.basement_dimmer_switch_level
+        entity_id: light.basement_dimmer_switch
     condition:
       - condition: numeric_state
-        entity_id: light.basement_dimmer_switch_level
-        value_template: "{{ state_attr('light.basement_dimmer_switch_level', 'brightness') | int }}"
+        entity_id: light.basement_dimmer_switch
+        value_template: "{{ state_attr('light.basement_dimmer_switch', 'brightness') | int }}"
         above: 20
     action:
       - service: light.turn_on
-        entity_id: light.basement_lamp_dimmer_plug_level
+        entity_id: light.basement_lamp_dimmer_plug
         data_template:
-          brightness: "{{ state_attr('light.basement_dimmer_switch_level', 'brightness') | int }}"
+          brightness: "{{ state_attr('light.basement_dimmer_switch', 'brightness') | int }}"
 
   - alias: "Turn on front door light"
     initial_state: true
@@ -467,7 +470,7 @@ automation:
         event: sunset
     action:
       - service: light.turn_on
-        entity_id: light.front_door_dimmer_switch_level
+        entity_id: light.front_door_dimmer_switch
 
   - alias: "Turn off front door light"
     initial_state: true
@@ -476,7 +479,7 @@ automation:
         event: sunrise
     action:
       - service: light.turn_off
-        entity_id: light.front_door_dimmer_switch_level
+        entity_id: light.front_door_dimmer_switch
 
   - alias: "Bathroom light dim start"
     initial_state: true

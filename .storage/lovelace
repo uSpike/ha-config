@@ -1,4 +1,6 @@
 {
+    "version": 1,
+    "key": "lovelace",
     "data": {
         "config": {
             "title": "Home",
@@ -46,16 +48,16 @@
                                     "entity": "light.office"
                                 },
                                 {
-                                    "entity": "light.front_door_dimmer_switch_level"
+                                    "entity": "light.front_door_dimmer_switch"
                                 },
                                 {
-                                    "entity": "light.kitchen_dimmer_switch_level"
+                                    "entity": "light.kitchen_dimmer_switch"
                                 },
                                 {
-                                    "entity": "light.deck_dimmer_plug_level"
+                                    "entity": "light.deck_dimmer"
                                 },
                                 {
-                                    "entity": "light.bathroom_dimmer_switch_level"
+                                    "entity": "light.bathroom_dimmer"
                                 }
                             ],
                             "show_header_toggle": false,
@@ -75,30 +77,14 @@
                         {
                             "entities": [
                                 {
-                                    "entity": "lock.front_door_lock_locked"
+                                    "entity": "lock.front_door_lock"
                                 },
                                 {
-                                    "entity": "lock.garage_door_lock_locked"
+                                    "entity": "lock.garage_door_lock"
                                 }
                             ],
                             "title": "Locks",
                             "type": "entities"
-                        },
-                        {
-                            "cards": [
-                                {
-                                    "entities": [
-                                        {
-                                            "entity": "sensor.home_power_watts"
-                                        }
-                                    ],
-                                    "hours_to_show": 8,
-                                    "refresh_interval": 30,
-                                    "title": "Power usage",
-                                    "type": "history-graph"
-                                }
-                            ],
-                            "type": "vertical-stack"
                         },
                         {
                             "entities": [
@@ -124,11 +110,10 @@
                         {
                             "cards": [
                                 {
-                                    "entity": "media_player.home",
                                     "group": true,
+                                    "toggle_power": false,
                                     "hide": {
                                         "controls": true,
-                                        "power_state": false,
                                         "volume": true
                                     },
                                     "shortcuts": {
@@ -157,40 +142,44 @@
                                         "hide_when_off": true
                                     },
                                     "source": "icon",
-                                    "type": "custom:mini-media-player"
+                                    "type": "custom:mini-media-player",
+                                    "entity": "media_player.home"
                                 },
                                 {
-                                    "entity": "media_player.bedroom",
                                     "group": true,
+                                    "toggle_power": false,
                                     "hide": {
                                         "controls": true,
                                         "source": true
                                     },
                                     "icon": "mdi:speaker",
                                     "name": "Bedroom",
-                                    "type": "custom:mini-media-player"
+                                    "type": "custom:mini-media-player",
+                                    "entity": "media_player.bedroom"
                                 },
                                 {
-                                    "entity": "media_player.kitchen",
                                     "group": true,
+                                    "toggle_power": false,
                                     "hide": {
                                         "controls": true,
                                         "source": true
                                     },
                                     "icon": "mdi:speaker",
                                     "name": "Kitchen",
-                                    "type": "custom:mini-media-player"
+                                    "type": "custom:mini-media-player",
+                                    "entity": "media_player.kitchen"
                                 },
                                 {
-                                    "entity": "media_player.livingroom",
                                     "group": true,
+                                    "toggle_power": false,
                                     "hide": {
                                         "controls": true,
                                         "source": true
                                     },
                                     "icon": "mdi:speaker",
                                     "name": "Livingroom",
-                                    "type": "custom:mini-media-player"
+                                    "type": "custom:mini-media-player",
+                                    "entity": "media_player.livingroom"
                                 }
                             ],
                             "type": "vertical-stack"
@@ -199,18 +188,8 @@
                             "cards": [
                                 {
                                     "card": {
-                                        "cards": [
-                                            {
-                                                "entity": "media_player.spotify_jordan",
-                                                "type": "media-control"
-                                            },
-                                            {
-                                                "account": "jordan",
-                                                "spotify_entity": "media_player.spotify_jordan",
-                                                "type": "custom:spotify-card"
-                                            }
-                                        ],
-                                        "type": "vertical-stack"
+                                        "type": "media-control",
+                                        "entity": "media_player.spotify_jordan"
                                     },
                                     "conditions": [
                                         {
@@ -222,18 +201,8 @@
                                 },
                                 {
                                     "card": {
-                                        "cards": [
-                                            {
-                                                "entity": "media_player.spotify_kristen",
-                                                "type": "media-control"
-                                            },
-                                            {
-                                                "account": "kristen",
-                                                "spotify_entity": "media_player.spotify_kristen",
-                                                "type": "custom:spotify-card"
-                                            }
-                                        ],
-                                        "type": "vertical-stack"
+                                        "type": "media-control",
+                                        "entity": "media_player.spotify_kristen"
                                     },
                                     "conditions": [
                                         {
@@ -287,7 +256,5 @@
                 }
             ]
         }
-    },
-    "key": "lovelace",
-    "version": 1
+    }
 }
