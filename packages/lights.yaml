@@ -56,7 +56,7 @@ lifx:
 light:
   - platform: switch
     name: Livingroom Switch
-    entity_id: switch.living_room_switch_switch
+    entity_id: switch.livingroom_switch
 
   - platform: switch
     name: Office Lamp

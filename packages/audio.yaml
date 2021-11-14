@@ -8,6 +8,13 @@ spotify:
   client_id: !secret jordan_spotify_client_id
   client_secret: !secret jordan_spotify_client_secret
 
+group:
+  audio_clients:
+    entities:
+      - media_player.kitchen
+      - media_player.bedroom
+      - media_player.livingroom
+
 media_player:
   - platform: yamaha_musiccast
     host: 10.52.110.12
@@ -87,7 +94,7 @@ media_player:
   - platform: universal
     name: "Livingroom"
     children:
-      - media_player.livingroom_receiver_main
+      - media_player.livingroom_receiver
       - media_player.snapcast_client_livingroom
     state_template: >
       {% if state_attr('media_player.snapcast_client_livingroom', 'is_volume_muted') %}
@@ -106,69 +113,53 @@ media_player:
       volume_set:
         service: media_player.volume_set
         data_template:
-          entity_id: media_player.livingroom_receiver_main
+          entity_id: media_player.livingroom_receiver
           volume_level: '{{ 0.3 + ((0.75 - 0.30) * volume_level) }}'
     attributes:
       volume_level: sensor.livingroom_volume_level
-      is_volume_muted: media_player.livingroom_receiver_main|is_volume_muted
+      is_volume_muted: media_player.livingroom_receiver|is_volume_muted
       source: media_player.snapcast_client_livingroom|source
       source_list: media_player.snapcast_client_livingroom|source_list
 
   - platform: universal
     name: Home
     children:
-      - media_player.kitchen
-      - media_player.bedroom
-      - media_player.livingroom
+      - group.audio_clients
     commands:
       turn_on:
         service: media_player.turn_on
         entity_id:
-          - media_player.kitchen
-          - media_player.bedroom
-          - media_player.livingroom
+          - group.audio_clients
       turn_off:
         service: media_player.turn_off
         entity_id:
-          - media_player.kitchen
-          - media_player.bedroom
-          - media_player.livingroom
+          - group.audio_clients
       volume_set:
         service: media_player.volume_set
         data_template:
           entity_id:
-            - media_player.kitchen
-            - media_player.bedroom
-            - media_player.livingroom
+            - group.audio_clients
           volume_level: '{{ volume_level }}'
       volume_mute:
         service: media_player.volume_mute
         data_template:
           entity_id:
-            - media_player.kitchen
-            - media_player.bedroom
-            - media_player.livingroom
+            - group.audio_clients
           is_volume_muted: '{{ is_volume_muted }}'
       volume_up:
         service: media_player.volume_up
         entity_id:
-          - media_player.kitchen
-          - media_player.bedroom
-          - media_player.livingroom
+          - group.audio_clients
       volume_down:
         service: media_player.volume_down
         entity_id:
-          - media_player.kitchen
-          - media_player.bedroom
-          - media_player.livingroom
+          - group.audio_clients
       select_source:
         service: media_player.select_source
         data_template:
           entity_id:
             - media_player.snapcast_group_home
-            - media_player.snapcast_client_kitchen
-            - media_player.snapcast_client_bedroom
-            - media_player.snapcast_client_livingroom
+            #- group.audio_clients
           source: '{{ source }}'
     attributes:
       is_volume_muted: media_player.snapcast_group_home|is_volume_muted
@@ -180,15 +171,19 @@ sensor:
     sensors:
       home_audio_source:
         value_template: '{{ state_attr("media_player.home", "source") }}'
+      spotify_jordan_source:
+        value_template: '{{ state_attr("media_player.spotify_jordan", "source") }}'
+      spotify_kristen_source:
+        value_template: '{{ state_attr("media_player.spotify_kristen", "source") }}'
       # Volume levels scaled back to 0.0 to 1.0
       kitchen_volume_level:
-        value_template: '{{ (state_attr("media_player.snapcast_client_kitchen", "volume_level") - 0.0) / (0.40 - 0.0) }}'
+        value_template: '{{ float(state_attr("media_player.snapcast_client_kitchen", "volume_level"), default=0.0) / (0.40 - 0.0) }}'
       bedroom_volume_level:
-        value_template: '{{ (state_attr("media_player.snapcast_client_bedroom", "volume_level") - 0.0) / (0.40 - 0.0) }}'
+        value_template: '{{ float(state_attr("media_player.snapcast_client_bedroom", "volume_level"), default=0.0) / (0.40 - 0.0) }}'
       livingroom_volume_level:
         value_template: >-
-          {% set vol = state_attr("media_player.livingroom_receiver_main", "volume_level") %}
-          {% if vol != None %}
+          {% set vol = float(state_attr("media_player.livingroom_receiver", "volume_level"), default=0.0) %}
+          {% if vol >= 0.0 %}
           {{ (vol - 0.3) / (0.75 - 0.3) }}
           {% else %}
           0.0
@@ -200,27 +195,17 @@ script:
       - service: media_player.volume_mute
         data: {entity_id: media_player.snapcast_client_livingroom, is_volume_muted: False}
       - service: media_player.turn_on
-        entity_id: media_player.livingroom_receiver_main
-      - wait_template: '{{ is_state("media_player.livingroom_receiver_main", "on") }}'
+        entity_id: media_player.livingroom_receiver
+      - wait_template: '{{ is_state("media_player.livingroom_receiver", "on") }}'
         timeout: "00:00:07"
       - service: media_player.select_source
-        data: {entity_id: media_player.livingroom_receiver_main, source: "coaxial"}
-
+        data: {entity_id: media_player.livingroom_receiver, source: "coaxial"}
   turn_off_livingroom_audio:
     sequence:
       - service: media_player.volume_mute
         data: {entity_id: media_player.snapcast_client_livingroom, is_volume_muted: True}
-      - choose:
-          - conditions:
-              - condition: state
-                entity_id: media_player.livingroom_receiver_main
-                state: "on"
-            sequence:
-              - service: media_player.select_source
-                data: {entity_id: media_player.livingroom_receiver_main, source: "tuner"}
-              - service: media_player.turn_off
-                entity_id: media_player.livingroom_receiver_main
-
+      - service: media_player.turn_off
+        entity_id: media_player.livingroom_receiver
   audio_source_radio_wpr:
     sequence:
       - service: media_player.play_media
@@ -258,7 +243,7 @@ automation:
     trigger:
       - platform: event
         event_type: zwave_js_value_notification
-        event_data: {node_id: 24, scene_label: "Scene 001"}
+        event_data: {node_id: 24, label: "Scene 001"}
     action:
       - choose:
           - conditions:
@@ -276,13 +261,13 @@ automation:
                 value_template: '{{ trigger.event.data["value"] == "KeyHeldDown" }}'
             sequence:
               - service: media_player.media_next_track
-                entity_id: media_player.spotify_jordan
+                entity_id: media_player.spotify_kristen
 
   - alias: "Remote WPR"
     trigger:
       - platform: event
         event_type: zwave_js_value_notification
-        event_data: {node_id: 24, scene_label: "Scene 004"}
+        event_data: {node_id: 24, label: "Scene 004"}
     action:
       - choose:
           - conditions:
@@ -300,7 +285,7 @@ automation:
     trigger:
       - platform: event
         event_type: zwave_js_value_notification
-        event_data: {node_id: 24, scene_label: "Scene 003", value: "KeyPressed"}
+        event_data: {node_id: 24, label: "Scene 003", value: "KeyPressed"}
     action:
       - service: media_player.turn_off
         entity_id: media_player.home
